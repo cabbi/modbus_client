@@ -5,8 +5,9 @@ This is a set of three packages implementing Modbus Client sending requests to a
 - [Modbus Client TCP](https://pub.dev/packages/modbus_client_tcp) implements the **TCP** protocol to send requests via **ethernet networks**.
 - [Modbus Client Serial](https://pub.dev/packages/modbus_client_serial) implements the **ASCII** and **RTU** protocols to send requests via **Serial Port**
 
-
-The split of the packages is done to minimize dependencies on your project.
+**Notes**
+- In order to use serial implementation you need to build the serial library [libserialport build instructions](https://github.com/jpnurmi/libserialport/blob/master/README)
+- The split of the packages is done to minimize dependencies on your project.
 
 # Usage
 
