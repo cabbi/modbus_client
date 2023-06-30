@@ -18,6 +18,7 @@ abstract class ModbusNumRegister<T extends num> extends ModbusElement<T> {
   ModbusNumRegister(
       {required super.name,
       super.description,
+      super.onUpdate,
       required super.type,
       required super.address,
       required super.byteCount,
@@ -28,12 +29,18 @@ abstract class ModbusNumRegister<T extends num> extends ModbusElement<T> {
 
   @override
   ModbusWriteRequest getWriteRequest(dynamic value,
-      {bool rawValue = false, int? unitId}) {
+      {bool rawValue = false, int? unitId, Duration? responseTimeout}) {
     switch (byteCount) {
       case 2:
-        return super.getWriteRequest(value, rawValue: rawValue, unitId: unitId);
+        return super.getWriteRequest(value,
+            rawValue: rawValue,
+            unitId: unitId,
+            responseTimeout: responseTimeout);
       case 4:
-        return _getWriteRequest32(value, rawValue: rawValue, unitId: unitId);
+        return _getWriteRequest32(value,
+            rawValue: rawValue,
+            unitId: unitId,
+            responseTimeout: responseTimeout);
     }
     throw ModbusException(
         context: "ModbusNumRegister",
@@ -41,7 +48,7 @@ abstract class ModbusNumRegister<T extends num> extends ModbusElement<T> {
   }
 
   ModbusWriteRequest _getWriteRequest32(dynamic value,
-      {required bool rawValue, int? unitId}) {
+      {required bool rawValue, int? unitId, Duration? responseTimeout}) {
     if (type.writeMultipleFunction == null) {
       throw ModbusException(
           context: "ModbusBitElement",
@@ -55,7 +62,8 @@ abstract class ModbusNumRegister<T extends num> extends ModbusElement<T> {
       ..setUint16(3, 2) // value register count
       ..setUint8(5, 4) // value byte count
       ..setUint32(6, rawValue ? value : _getRawValue(value));
-    return ModbusWriteRequest(this, pdu, unitId);
+    return ModbusWriteRequest(this, pdu,
+        unitId: unitId, responseTimeout: responseTimeout);
   }
 
   @override
@@ -63,7 +71,7 @@ abstract class ModbusNumRegister<T extends num> extends ModbusElement<T> {
 
   @override
   T? setValueFromBytes(Uint8List rawValues) {
-    return _value = (_getValueFromData(rawValues) * multiplier) + offset as T;
+    return value = (_getValueFromData(rawValues) * multiplier) + offset as T;
   }
 
   @override
@@ -82,6 +90,7 @@ class ModbusInt16Register extends ModbusNumRegister {
       required super.type,
       super.uom,
       super.description,
+      super.onUpdate,
       super.multiplier = 1,
       super.offset = 0})
       : super(byteCount: 2);
@@ -99,6 +108,7 @@ class ModbusUint16Register extends ModbusNumRegister {
       required super.type,
       super.uom,
       super.description,
+      super.onUpdate,
       super.multiplier = 1,
       super.offset = 0})
       : super(byteCount: 2);
@@ -116,6 +126,7 @@ class ModbusInt32Register extends ModbusNumRegister {
       required super.type,
       super.uom,
       super.description,
+      super.onUpdate,
       super.multiplier = 1,
       super.offset = 0})
       : super(byteCount: 4);
@@ -133,6 +144,7 @@ class ModbusUint32Register extends ModbusNumRegister {
       required super.type,
       super.uom,
       super.description,
+      super.onUpdate,
       super.multiplier = 1,
       super.offset = 0})
       : super(byteCount: 4);

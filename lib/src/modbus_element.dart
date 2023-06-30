@@ -19,6 +19,8 @@ abstract class ModbusElement<T> {
   final ModbusElementType type;
   final int address;
   final int byteCount;
+  final Function(ModbusElement self)? onUpdate;
+
   T? _value;
 
   ModbusElement(
@@ -26,20 +28,29 @@ abstract class ModbusElement<T> {
       this.description = "",
       required this.type,
       required this.address,
-      required this.byteCount});
+      required this.byteCount,
+      this.onUpdate});
 
   T? get value => _value;
-  set value(dynamic newValue) => _value = newValue;
+  set value(dynamic newValue) {
+    var changed = _value != newValue;
+    _value = newValue;
+    if (changed && onUpdate != null) {
+      onUpdate!(this);
+    }
+  }
+
   T? setValueFromBytes(Uint8List rawValues);
 
   /// Gets a read request from this element
-  ModbusReadRequest getReadRequest({int? unitId}) {
+  ModbusReadRequest getReadRequest({int? unitId, Duration? responseTimeout}) {
     var pdu = Uint8List(5);
     ByteData.view(pdu.buffer)
       ..setUint8(0, type.readFunction.code)
       ..setUint16(1, address)
       ..setUint16(3, byteCount > 1 ? byteCount ~/ 2 : 1);
-    return ModbusReadRequest(this, pdu, unitId);
+    return ModbusReadRequest(this, pdu,
+        unitId: unitId, responseTimeout: responseTimeout);
   }
 
   /// Gets a write request from this element.
@@ -47,7 +58,7 @@ abstract class ModbusElement<T> {
   /// If [rawValue] is true then the integer [value] is written as it is
   /// without any value or type conversion.
   ModbusWriteRequest getWriteRequest(dynamic value,
-      {bool rawValue = false, int? unitId}) {
+      {bool rawValue = false, int? unitId, Duration? responseTimeout}) {
     if (type.writeSingleFunction == null) {
       throw ModbusException(
           context: "ModbusBitElement",
@@ -59,7 +70,8 @@ abstract class ModbusElement<T> {
       ..setUint8(0, type.writeSingleFunction!.code)
       ..setUint16(1, address)
       ..setUint16(3, rawValue ? value as int : _getRawValue(value));
-    return ModbusWriteRequest(this, pdu, unitId);
+    return ModbusWriteRequest(this, pdu,
+        unitId: unitId, responseTimeout: responseTimeout);
   }
 
   int _getRawValue(dynamic value);

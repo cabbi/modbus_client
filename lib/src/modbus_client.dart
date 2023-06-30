@@ -6,19 +6,27 @@ import 'package:modbus_client/modbus_client.dart';
 ///
 /// If [unitId] id specified then it is used to make requests. The [unitId] is
 /// overridden in case the [send] command has it's own [unitId] defined.
+///
+/// Based on the [connectionMode] send command will connect in case current
+/// connection is not yet established.
 abstract class ModbusClient {
   final int? unitId;
+  final Duration responseTimeout;
+  final ModbusConnectionMode connectionMode;
 
-  ModbusClient({this.unitId});
+  ModbusClient(
+      {this.unitId,
+      this.responseTimeout = const Duration(seconds: 3),
+      this.connectionMode = ModbusConnectionMode.autoConnectAndKeepConnected});
 
   /// Sends the modbus requests. A [ModbusResponseCode] is returned as a future.
   ///
   /// If [request] has its own [unitId] defined, then it will override this
   /// client [unitId] (see [getUnitId]).
-  /// If [autoConnect] is true then send command will connect in case current
-  /// connection is not yet established.
-  Future<ModbusResponseCode> send(ModbusRequest request,
-      {bool autoConnect = true});
+  ///
+  /// If [request] has its own [responseTimeout] defined, then it will override
+  /// this client [responseTimeout] (see [getResponseTimeout]).
+  Future<ModbusResponseCode> send(ModbusRequest request);
 
   /// Returns true if connection to client is established.
   bool get isConnected;
@@ -37,4 +45,9 @@ abstract class ModbusClient {
       : unitId != null
           ? unitId!
           : 0;
+
+  /// If [request] has its own [responseTimeout] defined, then it will override
+  /// this client [responseTimeout].
+  Duration getResponseTimeout(ModbusRequest request) =>
+      request.responseTimeout ?? responseTimeout;
 }

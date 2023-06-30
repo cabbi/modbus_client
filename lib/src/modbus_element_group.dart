@@ -41,7 +41,8 @@ class ModbusElementsGroup extends Iterable<ModbusElement> {
   }
 
   /// Gets a read request from this elements group
-  ModbusReadGroupRequest getReadRequest({int? unitId}) {
+  ModbusReadGroupRequest getReadRequest(
+      {int? unitId, Duration? responseTimeout}) {
     if (length == 0) {
       throw ModbusException(
           context: "ModbusElements",
@@ -53,7 +54,8 @@ class ModbusElementsGroup extends Iterable<ModbusElement> {
       ..setUint8(0, _type!.readFunction.code)
       ..setUint16(1, _startAddress)
       ..setUint16(3, _addressRange);
-    return ModbusReadGroupRequest(this, pdu, unitId);
+    return ModbusReadGroupRequest(this, pdu,
+        unitId: unitId, responseTimeout: responseTimeout);
   }
 
 /* NO IMPLEMENTED: 

@@ -7,22 +7,24 @@ class ModbusBitElement extends ModbusElement<bool> {
       {required super.name,
       super.description,
       required super.address,
-      required super.type})
+      required super.type,
+      super.onUpdate})
       : super(byteCount: 1);
 
   @override
   set value(dynamic newValue) =>
-      newValue is num ? _value = newValue != 0 : _value = newValue;
+      newValue is num ? super.value = newValue != 0 : super.value = newValue;
   @override
   bool? setValueFromBytes(Uint8List rawValues) =>
-      _value = (rawValues.first & 0x01) != 0;
+      super.value = (rawValues.first & 0x01) != 0;
 
   @override
 
   /// NOTE: [rawValue] is ignored for bit elements!
   ModbusWriteRequest getWriteRequest(dynamic value,
-      {bool rawValue = false, int? unitId}) {
-    return super.getWriteRequest(value, rawValue: false, unitId: unitId);
+      {bool rawValue = false, int? unitId, Duration? responseTimeout}) {
+    return super.getWriteRequest(value,
+        rawValue: false, unitId: unitId, responseTimeout: responseTimeout);
   }
 
   @override

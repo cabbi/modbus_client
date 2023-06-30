@@ -13,13 +13,14 @@ class ModbusEpochRegister extends ModbusElement<DateTime> {
       required super.type,
       required this.epochType,
       super.description,
+      super.onUpdate,
       this.isUtc = false})
       : super(byteCount: 4);
 
   @override
   DateTime? setValueFromBytes(Uint8List rawValues) {
     var rawValue = ByteData.view(rawValues.buffer).getUint32(0);
-    return _value = DateTime.fromMillisecondsSinceEpoch(
+    return value = DateTime.fromMillisecondsSinceEpoch(
         epochType == ModbusEpochType.seconds ? rawValue * 1000 : rawValue);
   }
 

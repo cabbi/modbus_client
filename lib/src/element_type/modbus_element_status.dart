@@ -17,6 +17,7 @@ class ModbusStatusRegister extends ModbusElement<ModbusStatus> {
       required super.address,
       required super.type,
       super.description,
+      super.onUpdate,
       required this.statusValues,
       this.defaultStatus})
       : super(byteCount: 2);
@@ -35,7 +36,7 @@ class ModbusStatusRegister extends ModbusElement<ModbusStatus> {
   @override
   ModbusStatus? setValueFromBytes(Uint8List rawValues) {
     var rawValue = ByteData.view(rawValues.buffer).getUint16(0);
-    _value = statusValues.firstWhere((val) {
+    value = statusValues.firstWhere((val) {
       return val.statusValue == rawValue;
     },
         orElse: () => defaultStatus != null

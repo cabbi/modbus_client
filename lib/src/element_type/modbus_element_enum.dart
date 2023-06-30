@@ -33,6 +33,7 @@ class ModbusEnumRegister<T extends ModbusIntEnum> extends ModbusElement<T> {
       required super.address,
       required super.type,
       super.description,
+      super.onUpdate,
       required this.enumValues,
       this.defaultValue})
       : super(byteCount: 2);
@@ -40,7 +41,7 @@ class ModbusEnumRegister<T extends ModbusIntEnum> extends ModbusElement<T> {
   @override
   T? setValueFromBytes(Uint8List rawValues) {
     var rawValue = ByteData.view(rawValues.buffer).getUint16(0);
-    _value = enumValues.firstWhereOrNull((val) {
+    value = enumValues.firstWhereOrNull((val) {
           return val.intValue == rawValue;
         }) ??
         defaultValue;

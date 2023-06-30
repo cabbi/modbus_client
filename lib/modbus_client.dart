@@ -116,6 +116,21 @@ enum ModbusResponseCode {
           orElse: () => ModbusResponseCode.undefinedErrorCode);
 }
 
+/// The connection mode used when sending a request.
+enum ModbusConnectionMode {
+  /// Requires manual connection of the client before sending requests.
+  /// Sending the request will fail if client is not connected.
+  doNotConnect,
+
+  /// Client will be connected if not already before sending the
+  /// requests. After request has been sent, client is disconnected.
+  autoConnectAndDisconnect,
+
+  /// Client will be connected if not already before sending the
+  /// requests. After request has been sent, client is disconnected.
+  autoConnectAndKeepConnected,
+}
+
 /// The modbus_client package base [Exception] class.
 class ModbusException implements Exception {
   final String context;

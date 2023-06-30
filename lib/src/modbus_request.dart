@@ -15,12 +15,13 @@ import 'package:modbus_client/modbus_client.dart';
 /// BYTE - Exception Code
 abstract class ModbusRequest {
   final int? unitId;
+  final Duration? responseTimeout;
   final Uint8List protocolDataUnit;
   int get functionCode => protocolDataUnit[0];
   int get responsePduLength;
   late Completer<ModbusResponseCode> _responseCompleter;
 
-  ModbusRequest(this.protocolDataUnit, this.unitId) {
+  ModbusRequest(this.protocolDataUnit, {this.unitId, this.responseTimeout}) {
     if (protocolDataUnit.isEmpty) {
       throw ModbusException(
           context: "ModbusRequest",
@@ -62,7 +63,8 @@ abstract class ModbusRequest {
 
 /// A request for a modbus element.
 abstract class ModbusElementRequest extends ModbusRequest {
-  ModbusElementRequest(super.protocolDataUnit, [super.unitId]);
+  ModbusElementRequest(super.protocolDataUnit,
+      {super.unitId, super.responseTimeout});
 
   @override
   ModbusResponseCode _setFromPduResponse(int functionCode, Uint8List pdu) {
@@ -97,7 +99,8 @@ class ModbusReadRequest extends ModbusElementRequest {
   // N BYTES - Element Values
 
   final ModbusElement element;
-  ModbusReadRequest(this.element, super.protocolDataUnit, [super.unitId]);
+  ModbusReadRequest(this.element, super.protocolDataUnit,
+      {super.unitId, super.responseTimeout});
 
   @override
   int get responsePduLength => 2 + element.byteCount;
@@ -124,7 +127,7 @@ class ModbusReadGroupRequest extends ModbusElementRequest {
 
   final ModbusElementsGroup elementGroup;
   ModbusReadGroupRequest(this.elementGroup, super.protocolDataUnit,
-      [super.unitId]);
+      {super.unitId, super.responseTimeout});
 
   @override
   int get responsePduLength =>
@@ -155,7 +158,8 @@ class ModbusReadGroupRequest extends ModbusElementRequest {
 /// A write request of a single element.
 class ModbusWriteRequest extends ModbusElementRequest {
   final ModbusElement element;
-  ModbusWriteRequest(this.element, super.protocolDataUnit, [super.unitId]);
+  ModbusWriteRequest(this.element, super.protocolDataUnit,
+      {super.unitId, super.responseTimeout});
 
   // Request PDU
   // -----------

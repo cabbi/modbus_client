@@ -1,25 +1,14 @@
-This package implements  Modbus Client sending requests to a Server (i.e. a remote device) over TCP/IP or Serial port.
+# Introduction
+This is a set of three packages implementing Modbus Client sending requests to a remote device (i.e. Modbus Server).
 
-## Features
+[Modbus Client](https://pub.dev/packages/modbus_client) is the base implementation for the **TCP** and **Serial** packages.
+[Modbus Client TCP](https://pub.dev/packages/modbus_client_tcp) implements the **ASCII** and **RTU** protocols to send requests via **Serial Port**
+[Modbus Client Serial](https://pub.dev/packages/modbus_client_serial) implements the **TCP** protocol to sent requests via **ethernet networks**.
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+The split of the packages is done to minimize dependencies on your project.
 
-## Getting started
+# Usage
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
+Using modbus client is simple. You define your elements, create a read or write request out of them and use the client to send the request. 
 ```dart
-const like = 'sample';
 ```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.

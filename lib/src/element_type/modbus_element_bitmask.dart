@@ -32,6 +32,7 @@ class ModbusBitMaskRegister extends ModbusElement<List<ModbusBitMask>> {
       required super.address,
       required super.type,
       super.description,
+      super.onUpdate,
       required List<ModbusBitMask> bitMasks})
       : super(byteCount: 2) {
     _value = bitMasks;
@@ -57,14 +58,22 @@ class ModbusBitMaskRegister extends ModbusElement<List<ModbusBitMask>> {
 
   @override
   List<ModbusBitMask>? setValueFromBytes(Uint8List rawValues) {
+    bool anyChange = false;
     var rawValue = ByteData.view(rawValues.buffer).getUint16(0);
     int mask = 0x01;
     for (int bit = 0; bit < 16; bit++) {
       var bitMask = bitMaskMap[bit];
       if (bitMask != null) {
-        bitMask.isActive = (rawValue & mask) != 0;
+        var newValue = (rawValue & mask) != 0;
+        if (bitMask.isActive != newValue) {
+          anyChange = true;
+        }
+        bitMask.isActive = newValue;
       }
       mask <<= 1;
+    }
+    if (anyChange && onUpdate != null) {
+      onUpdate!(this);
     }
     return _value;
   }

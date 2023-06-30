@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [ 
         {
-            "name": "modbus_client",
+            "name": "first_example",
             "request": "launch",
             "type": "dart",
-            "program": "example\\modbus_client_example.dart"
+            "program": "example\\first_example.dart"
         },
         {
-            "name": "Modbus SUN2000",
+            "name": "second_example",
             "request": "launch",
             "type": "dart",
-            "program": "example\\modbus_client_sun2000.dart"
+            "program": "example\\second_example.dart"
         }
     ]
 }
