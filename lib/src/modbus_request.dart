@@ -30,7 +30,8 @@ abstract class ModbusRequest {
     reset();
   }
 
-  Future<ModbusResponseCode> get responseCode => _responseCompleter.future;
+  Future<ModbusResponseCode> get responseCode async =>
+      _responseCompleter.future;
 
   void reset() {
     _responseCompleter = Completer<ModbusResponseCode>();
