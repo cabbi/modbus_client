@@ -1,3 +1,4 @@
+import 'package:logging/logging.dart';
 import 'package:modbus_client/modbus_client.dart';
 import 'package:modbus_client_tcp/modbus_client_tcp.dart';
 
@@ -25,6 +26,8 @@ enum MeterStatus implements ModbusIntEnum {
 }
 
 void main() async {
+  ModbusAppLogger(Level.INFO);
+
   var client = ModbusClientTcp('192.168.8.125',
       serverPort: 502,
       unitId: 1,
@@ -448,13 +451,11 @@ void main() async {
         name: "Startup time",
         type: ModbusElementType.holdingRegister,
         address: 32091,
-        epochType: ModbusEpochType.seconds,
         isUtc: false),
     ModbusEpochRegister(
         name: "Shutdown time",
         type: ModbusElementType.holdingRegister,
         address: 32093,
-        epochType: ModbusEpochType.seconds,
         isUtc: false),
     ModbusUint32Register(
         name: "Accumulated energy yield",

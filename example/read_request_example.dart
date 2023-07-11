@@ -1,7 +1,11 @@
+import 'package:logging/logging.dart';
 import 'package:modbus_client/modbus_client.dart';
 import 'package:modbus_client_tcp/modbus_client_tcp.dart';
 
 void main() async {
+  // Simple modbus logging
+  ModbusAppLogger(Level.FINE);
+
   // Create a modbus int16 register element
   var batteryTemperature = ModbusInt16Register(
       name: "BatteryTemperature",

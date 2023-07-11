@@ -5,9 +5,23 @@ This is a set of three packages implementing Modbus Client sending requests to a
 - [Modbus Client TCP](https://pub.dev/packages/modbus_client_tcp) implements the **TCP** protocol to send requests via **ethernet networks**.
 - [Modbus Client Serial](https://pub.dev/packages/modbus_client_serial) implements the **ASCII** and **RTU** protocols to send requests via **Serial Port**
 
-**Notes**
-- In order to use serial implementation you need to build the serial library [libserialport build instructions](https://github.com/jpnurmi/libserialport/blob/master/README)
-- The split of the packages is done to minimize dependencies on your project.
+The split of the packages is done to minimize dependencies on your project.
+
+**Notes for serial implementation**
+- **For Flutter projects**: you only need to add flutter_libserialport package to your own project (i.e. run *flutter pub add flutter_libserialport*)
+- **For Dart projects**: you need to build the serial library [libserialport build instructions](https://github.com/jpnurmi/libserialport/blob/master/README). As a workaround you can create a dummy Flutter project, add the flutter_libserialport package, build it and copy the auto-generated **serialport** library from the build folder into your project's root folder or wherever your binary code will run.
+
+# Features
+
+- **Auto connection mode**: specify how the **send** command behaves by auto connecting and auto disconnecting from the client by setting the [ModbusConnectionMode](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusConnectionMode.html)
+- **Unit id**: both the [Modbus Client](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusClient-class.html) and the [Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusElement/getReadRequest.html) can specify the target unit id. This can be useful when using serial clients where more units/devices can be attached to one serial client.
+- **Response timeout**: A timeout waiting the response can be set in the [Modbus Client](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusClient-class.html) instance or in the [Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusElement/getReadRequest.html) itself.
+- **Connection timeout** (TCP only): specify a connection timeout for the [Modbus Client TCP](https://pub.dev/documentation/modbus_client_tcp/latest/modbus_client_tcp/ModbusClientTcp-class.html).
+- **Delay after connect** (TCP only): you can apply an optional delay after server connection. In some cases (e.g. Huawei SUN2000 inverter) the server will not respond if requests are sent right after the connection.  
+- **Element types**: this package offers a variety of element types: <a href="#NumericElements">ModbusNumRegister (int16, uint16, int32, uint32)</a>, <a href="#NumericElements">ModbusBitElement</a>, <a href="#EnumElements">ModbusEnumRegister</a>, <a href="#StatusElements">ModbusStatusRegister</a>, <a href="#BitMaskElements">ModbusBitMaskRegister</a>, <a href="#EpochElements">ModbusEpochRegister</a>.
+- **Group of elements**: in order to optimize request you can create <a href="#ElementGroups">group of elements</a>.
+- **Custom requests implementation**: you can easily implement custom request by overriding the [Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusRequest-class.html) class, assigning the request PDU (i.e. the protocolDataUnit) and override the **internalSetFromPduResponse** method or you override the [Element Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusElementRequest-class.html) class by overriding the **internalSetElementData** method.
+- **Logging**: Modbus Client libraries have logging enabled. You can activate logging with the root logger or by creating a [ModbusAppLogger](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusAppLogger-class.html) instance in your app. 
 
 # Usage
 
@@ -86,7 +100,7 @@ void main() async {
 
 This library has a wide range of defined modbus elements having a __name__, a __description__, a modbus __address__ and an __update callback__ you can use in case the element value has been updated. 
 
-## Bit and Numeric Elements
+## Bit and Numeric Elements <a id="NumericElements"></a>
 
 Typical elements are simple bit and numeric values:
 - **ModbusDiscreteInput**
@@ -98,7 +112,7 @@ Typical elements are simple bit and numeric values:
 
 Numeric elements have an **uom** (i.e. unit of measure), a **multiplier** and **offset** to make conversion from raw to engineering values (i.e. value = read_value*multiplier + offset), and **viewDecimalPlaces** to print out only needed decimals.
 
-## Enum Element
+## Enum Element <a id="EnumElements"></a>
 To read and write an enum as an element you can use a **ModbusEnumRegister**
 
 ```dart
@@ -137,7 +151,7 @@ void main() async {
 }
 ```
 
-## Status Element
+## Status Element <a id="StatusElements"></a>
 
 Similar to enum is a status element. Within a **ModbusStatusRegister** you can define all the possible statues (i.e. numeric <-> string pairs) for the element.
 
@@ -183,7 +197,7 @@ ModbusStatusRegister(
     ]),
 ```
 
-## Bit Mask Element
+## Bit Mask Element <a id="BitMaskElements"></a>
 
 Use **ModbusBitMaskRegister** if your device has registers where each bit value has a special meaning. You can define both an active and inactive value for each **ModbusBitMask** object.
 
@@ -212,21 +226,19 @@ ModbusBitMaskRegister(
     ]),
 ```
 
-## Epoch/DateTime Element
+## Epoch/DateTime Element <a id="EpochElements"></a>
 
-Use **ModbusEpochRegister** if your device holds timestamp values as epoch.
-The epoch might be represented both in seconds or milliseconds.
+Use **ModbusEpochRegister** if your device holds timestamp values as [Epoch/Unix time](https://en.wikipedia.org/wiki/Unix_time) in seconds.
 
 ``` dart
 ModbusEpochRegister(
     name: "Startup time",
     type: ModbusElementType.holdingRegister,
     address: 32091,
-    epochType: ModbusEpochType.seconds,
     isUtc: false);
 ```
 
-## Element Group
+## Element Group <a id="ElementGroups"></a>
 
 You can define a **ModbusElementsGroup** to optimize the elements reading.
 The most the element addresses are contiguous the most performant is the request. The address range limit for bits is 2000 and 125 for registers.

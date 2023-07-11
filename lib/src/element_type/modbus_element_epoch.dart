@@ -3,15 +3,17 @@ part of modbus_element;
 /// The Modbus epoch type used by [ModbusEpochRegister].
 enum ModbusEpochType { seconds, milliseconds }
 
+// TODO: lets have a uint64 register for the milliseconds implementation!
+
 /// This Uint32 register type converts the device epoch value into a [DateTime].
 class ModbusEpochRegister extends ModbusElement<DateTime> {
   final bool isUtc;
-  final ModbusEpochType epochType;
+  final ModbusEpochType epochType = ModbusEpochType.seconds;
+
   ModbusEpochRegister(
       {required super.name,
       required super.address,
       required super.type,
-      required this.epochType,
       super.description,
       super.onUpdate,
       this.isUtc = false})
@@ -26,7 +28,7 @@ class ModbusEpochRegister extends ModbusElement<DateTime> {
 
   @override
   int _getRawValue(dynamic value) {
-    // Expecting a List of ModbusBitMask
+    // Expecting a DateTime object
     if (value! is DateTime) {
       throw ModbusException(
           context: "ModbusBitElement",
@@ -34,6 +36,6 @@ class ModbusEpochRegister extends ModbusElement<DateTime> {
     }
     return epochType == ModbusEpochType.milliseconds
         ? value.millisecondsSinceEpoch
-        : value.millisecondsSinceEpoch / 1000 as int;
+        : value.millisecondsSinceEpoch ~/ 1000;
   }
 }

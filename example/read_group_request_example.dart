@@ -1,3 +1,4 @@
+import 'package:logging/logging.dart';
 import 'package:modbus_client/modbus_client.dart';
 import 'package:modbus_client_tcp/modbus_client_tcp.dart';
 
@@ -15,6 +16,9 @@ enum BatteryStatus implements ModbusIntEnum {
 }
 
 void main() async {
+  // Simple modbus logging
+  ModbusAppLogger(Level.FINE);
+
   // Create a modbus elements group
   var batteryRegs = ModbusElementsGroup([
     ModbusEnumRegister(

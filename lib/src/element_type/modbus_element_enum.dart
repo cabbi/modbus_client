@@ -50,7 +50,7 @@ class ModbusEnumRegister<T extends ModbusIntEnum> extends ModbusElement<T> {
 
   @override
   int _getRawValue(dynamic value) {
-    // Expecting a List of ModbusBitMask
+    // Expecting a ModbusIntEnum object
     if (value is! ModbusIntEnum) {
       throw ModbusException(
           context: "ModbusBitElement",

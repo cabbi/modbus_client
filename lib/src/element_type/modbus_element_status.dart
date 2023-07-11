@@ -24,7 +24,7 @@ class ModbusStatusRegister extends ModbusElement<ModbusStatus> {
 
   @override
   int _getRawValue(dynamic value) {
-    // Expecting a List of ModbusBitMask
+    // Expecting a ModbusStatus object
     if (value! is ModbusStatus) {
       throw ModbusException(
           context: "ModbusBitElement",

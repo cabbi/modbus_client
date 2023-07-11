@@ -55,10 +55,11 @@ abstract class ModbusRequest {
     }
 
     // Response completed!
-    setResponseCode(_setFromPduResponse(functionCode, pdu));
+    setResponseCode(internalSetFromPduResponse(functionCode, pdu));
   }
 
-  ModbusResponseCode _setFromPduResponse(int functionCode, Uint8List pdu) =>
+  ModbusResponseCode internalSetFromPduResponse(
+          int functionCode, Uint8List pdu) =>
       ModbusResponseCode.requestSucceed;
 }
 
@@ -68,21 +69,22 @@ abstract class ModbusElementRequest extends ModbusRequest {
       {super.unitId, super.responseTimeout});
 
   @override
-  ModbusResponseCode _setFromPduResponse(int functionCode, Uint8List pdu) {
+  ModbusResponseCode internalSetFromPduResponse(
+      int functionCode, Uint8List pdu) {
     // Assign response data
     if (ModbusFunctionCode.isReadFunction(functionCode)) {
-      _setElementData(pdu.sublist(2));
+      internalSetElementData(pdu.sublist(2));
     } else if (ModbusFunctionCode.isWriteSingleFunction(functionCode)) {
-      _setElementData(pdu.sublist(3));
+      internalSetElementData(pdu.sublist(3));
     }
     if (ModbusFunctionCode.isWriteMultipleFunction(functionCode)) {
-      _setElementData(protocolDataUnit.sublist(6));
+      internalSetElementData(protocolDataUnit.sublist(6));
     }
     return ModbusResponseCode.requestSucceed;
   }
 
   /// Sets the response result ot from the PDU data
-  void _setElementData(Uint8List data);
+  void internalSetElementData(Uint8List data);
 }
 
 /// A read request of a single element.
@@ -107,7 +109,7 @@ class ModbusReadRequest extends ModbusElementRequest {
   int get responsePduLength => 2 + element.byteCount;
 
   @override
-  void _setElementData(Uint8List data) {
+  void internalSetElementData(Uint8List data) {
     element.setValueFromBytes(data);
   }
 }
@@ -138,7 +140,7 @@ class ModbusReadGroupRequest extends ModbusElementRequest {
           : elementGroup.addressRange * 2);
 
   @override
-  void _setElementData(Uint8List data) {
+  void internalSetElementData(Uint8List data) {
     for (var register in elementGroup) {
       if (register.type.isRegister) {
         var startIndex = (register.address - elementGroup.startAddress) * 2;
@@ -178,7 +180,7 @@ class ModbusWriteRequest extends ModbusElementRequest {
   int get responsePduLength => 5;
 
   @override
-  void _setElementData(Uint8List data) {
+  void internalSetElementData(Uint8List data) {
     element.setValueFromBytes(data);
   }
 }
@@ -202,16 +204,11 @@ class ModbusWriteGroupRequest extends ModbusElementRequest {
 
   final ModbusElementsGroup elementGroup;
   ModbusWriteGroupRequest(this.elementGroup, super.protocolDataUnit, [super.unitId]);
-  void _setElementData(Uint8List data) {
-    // TODO
-  }
 
   @override
   int get responsePduLength => 5;
 
   @override
-  void _setElementData(Uint8List data) {
-    element.setValueFromBytes(data);
-  }
+  void internalSetElementData(Uint8List data);
 }
 */
