@@ -1,3 +1,6 @@
+## 1.0.3
+- Little adjustment in case 'setResponseCode' is called multiple times
+
 ## 1.0.2
 - Removed **ModbusEpochType** from **ModbusEpochRegister** since it's only a 32 bits registry for now and it cannot handle milliseconds representation.
 - Some cosmetic code changes in **ModbusRequest** and **ModbusElementRequest** to help overriding those classes.

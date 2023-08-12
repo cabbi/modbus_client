@@ -39,7 +39,9 @@ abstract class ModbusRequest {
 
   void setResponseCode(ModbusResponseCode code) {
     ModbusAppLogger.fine("Request completed with code: ${code.name}");
-    _responseCompleter.complete(code);
+    if (!_responseCompleter.isCompleted) {
+      _responseCompleter.complete(code);
+    }
   }
 
   void setFromPduResponse(Uint8List pdu) {
