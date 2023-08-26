@@ -1,4 +1,4 @@
-## 1.0.3
+## 1.0.3+1
 - Little adjustment in case 'setResponseCode' is called multiple times
 
 ## 1.0.2
