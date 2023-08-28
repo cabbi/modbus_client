@@ -18,8 +18,15 @@ void main() async {
       multiplier: 0.1,
       onUpdate: (self) => print(self));
 
+  // Discover the Modbus server
+  var serverIp = await ModbusClientTcp.discover("192.168.0.0");
+  if (serverIp == null) {
+    ModbusAppLogger.shout("No modbus server found!");
+    return;
+  }
+  
   // Create the modbus client.
-  var modbusClient = ModbusClientTcp("127.0.0.1", unitId: 1);
+  var modbusClient = ModbusClientTcp(serverIp, unitId: 1);
 
   // Send a read request from the element
   await modbusClient.send(batteryTemperature.getReadRequest());
@@ -80,8 +87,15 @@ void main() async {
         multiplier: 0.1),
   ]);
 
+  // Discover the Modbus server
+  var serverIp = await ModbusClientTcp.discover("192.168.0.0");
+  if (serverIp == null) {
+    ModbusAppLogger.shout("No modbus server found!");
+    return;
+  }
+  
   // Create the modbus client.
-  var modbusClient = ModbusClientTcp("127.0.0.1", unitId: 1);
+  var modbusClient = ModbusClientTcp(serverIp, unitId: 1);
 
   // Send a read request from the group
   await modbusClient.send(batteryRegs.getReadRequest());
@@ -131,7 +145,15 @@ void main() async {
       enumValues: BatteryStatus.values,
       onUpdate: (self) => print(self));
 
-  var modbusClient = ModbusClientTcp("127.0.0.1", unitId: 1);
+  // Discover the Modbus server
+  var serverIp = await ModbusClientTcp.discover("192.168.0.0");
+  if (serverIp == null) {
+    ModbusAppLogger.shout("No modbus server found!");
+    return;
+  }
+  
+  // Create the modbus client.
+  var modbusClient = ModbusClientTcp(serverIp, unitId: 1);
 
   var req = batteryStatus.getWriteRequest(BatteryStatus.running);
   var res = await modbusClient.send(req);
@@ -174,7 +196,15 @@ enum MeterStatus implements ModbusIntEnum {
 void main() async {
   ModbusAppLogger(Level.INFO);
 
-  var client = ModbusClientTcp('192.168.8.125',
+  // Discover the Modbus server
+  var serverIp = await ModbusClientTcp.discover("192.168.0.0");
+  if (serverIp == null) {
+    ModbusAppLogger.shout("No modbus server found!");
+    return;
+  }
+  
+  // Create the modbus client.
+  var client = ModbusClientTcp(serverIp,
       serverPort: 502,
       unitId: 1,
       responseTimeout: Duration(seconds: 3),

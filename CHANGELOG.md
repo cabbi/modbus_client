@@ -1,5 +1,6 @@
-## 1.0.3+1
+## 1.0.3+2
 - Little adjustment in case 'setResponseCode' is called multiple times
+- Documentation and examples update
 
 ## 1.0.2
 - Removed **ModbusEpochType** from **ModbusEpochRegister** since it's only a 32 bits registry for now and it cannot handle milliseconds representation.

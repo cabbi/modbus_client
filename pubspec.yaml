@@ -1,6 +1,6 @@
 name: modbus_client
 description: This is the base Modbus Client package sending requests to a remote device (i.e. Modbus Server) via Serial (ASCII and RTU) or TCP/IP connection.
-version: 1.0.3+1
+version: 1.0.3+2
 repository: https://github.com/cabbi/modbus_client
 
 environment:
@@ -13,5 +13,5 @@ dependencies:
 dev_dependencies:
   lints: ^2.0.0
   test: ^1.21.0
-  modbus_client_tcp: ^1.0.0
+  modbus_client_tcp: ^1.0.2
   modbus_client_serial: ^1.0.0

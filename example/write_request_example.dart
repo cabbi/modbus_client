@@ -31,7 +31,15 @@ void main() async {
       enumValues: BatteryStatus.values,
       onUpdate: (self) => print(self));
 
-  var modbusClient = ModbusClientTcp("127.0.0.1", unitId: 1);
+  // Discover the Modbus server
+  var serverIp = await ModbusClientTcp.discover("192.168.0.0");
+  if (serverIp == null) {
+    ModbusAppLogger.shout("No modbus server found!");
+    return;
+  }
+
+  // Create the modbus client.
+  var modbusClient = ModbusClientTcp(serverIp, unitId: 1);
 
   var req = batteryStatus.getWriteRequest(BatteryStatus.running);
   var res = await modbusClient.send(req);
