@@ -1,4 +1,4 @@
-part of modbus_element;
+part of '../modbus_element.dart';
 
 /// A Modbus bit mask type used by [ModbusBitMaskRegister].
 /// If the specified register [bit] number (0 based index) is 1 then [isActive]

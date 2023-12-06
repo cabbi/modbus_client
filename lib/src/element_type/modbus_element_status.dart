@@ -1,4 +1,4 @@
-part of modbus_element;
+part of '../modbus_element.dart';
 
 /// A Modbus status type used by [ModbusStatusRegister]
 class ModbusStatus {

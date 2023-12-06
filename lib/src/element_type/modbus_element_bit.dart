@@ -1,4 +1,4 @@
-part of modbus_element;
+part of '../modbus_element.dart';
 
 /// A Modbus bit value element. This is the base class of [ModbusDiscreteInput]
 /// and [ModbusCoil] elements.

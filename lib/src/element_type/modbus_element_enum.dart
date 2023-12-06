@@ -1,4 +1,4 @@
-part of modbus_element;
+part of '../modbus_element.dart';
 
 /// A Modbus enumeration type used by [ModbusEnumRegister]
 abstract class ModbusIntEnum {

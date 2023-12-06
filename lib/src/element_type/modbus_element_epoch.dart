@@ -1,4 +1,4 @@
-part of modbus_element;
+part of '../modbus_element.dart';
 
 /// The Modbus epoch type used by [ModbusEpochRegister].
 enum ModbusEpochType { seconds, milliseconds }

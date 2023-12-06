@@ -1,4 +1,4 @@
-part of modbus_element;
+part of '../modbus_element.dart';
 
 /// A numeric register where [type] can be [ModbusElementType.inputRegister] or
 /// [ModbusElementType.inputRegister]. The returned device value
