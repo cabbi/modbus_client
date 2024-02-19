@@ -40,12 +40,19 @@ class ModbusBitElement extends ModbusElement<bool> {
 /// A Modbus [ModbusElementType.discreteInput] value element.
 class ModbusDiscreteInput extends ModbusBitElement {
   ModbusDiscreteInput(
-      {required super.name, super.description, required super.address})
+      {required super.name,
+      super.description,
+      required super.address,
+      super.onUpdate})
       : super(type: ModbusElementType.discreteInput);
 }
 
 /// A Modbus [ModbusElementType.coil] value element.
 class ModbusCoil extends ModbusBitElement {
-  ModbusCoil({required super.name, super.description, required super.address})
+  ModbusCoil(
+      {required super.name,
+      super.description,
+      required super.address,
+      super.onUpdate})
       : super(type: ModbusElementType.coil);
 }

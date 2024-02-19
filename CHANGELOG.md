@@ -1,3 +1,6 @@
+## 1.0.4
+- Added 'onUpdate' paameter for ModbusDiscreteInput and ModbusCoil
+
 ## 1.0.3+3
 - Little adjustment in case 'setResponseCode' is called multiple times
 - Documentation and examples update
