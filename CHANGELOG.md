@@ -1,3 +1,6 @@
+## 1.1.0
+- Added Modbus Read & Write file records (i.e. 0x14 & 0x15 function codes)
+
 ## 1.0.4
 - Added 'onUpdate' paameter for ModbusDiscreteInput and ModbusCoil
 

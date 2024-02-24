@@ -23,6 +23,12 @@
             "program": "example\\write_request_example.dart"
         },
         {
+            "name": "file records example",
+            "request": "launch",
+            "type": "dart",
+            "program": "example\\file_records_request_example.dart"
+        },
+        {
             "name": "Huawei SUN2000 example",
             "request": "launch",
             "type": "dart",

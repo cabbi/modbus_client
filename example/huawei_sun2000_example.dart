@@ -28,7 +28,7 @@ enum MeterStatus implements ModbusIntEnum {
 void main() async {
   ModbusAppLogger(Level.INFO);
 
-  var serverIp = await ModbusClientTcp.discover("192.168.8.0");
+  var serverIp = await ModbusClientTcp.discover("192.168.0.0");
   if (serverIp == null) {
     ModbusAppLogger.shout("No modbus server found!");
     return;
