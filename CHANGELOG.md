@@ -1,3 +1,6 @@
+## 1.1.1
+- Added Uint16, Int16, Uint32, Int32, Float and Double ModbusFileRecord types
+
 ## 1.1.0
 - Added Modbus Read & Write file records (i.e. 0x14 & 0x15 function codes)
 

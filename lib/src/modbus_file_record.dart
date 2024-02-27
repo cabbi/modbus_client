@@ -5,30 +5,151 @@ int hi(int value) => (value & 0xFF00) >> 8;
 int lo(int value) => (value & 0x00FF);
 
 /// A file record element
-class ModbusFileRecord {
+abstract class ModbusFileRecord {
   final int fileNumber;
   final int recordNumber;
-  Uint8List recordBytes;
 
-  int get recordLength => recordBytes.length;
+  List<num> get recordData;
+  ByteBuffer get recordBuffer;
+  int get recordLength => recordBuffer.lengthInBytes ~/ 2;
 
-  ModbusFileRecord(
-      {required this.fileNumber,
-      required this.recordNumber,
-      required this.recordBytes});
+  ModbusFileRecord({required this.fileNumber, required this.recordNumber});
+}
 
-  factory ModbusFileRecord.empty(
+/// A UInt6 file record type
+class ModbusFileUint16Record extends ModbusFileRecord {
+  @override
+  final Uint16List recordData;
+  @override
+  ByteBuffer get recordBuffer => recordData.buffer;
+
+  ModbusFileUint16Record(
+      {required super.fileNumber,
+      required super.recordNumber,
+      required this.recordData});
+
+  factory ModbusFileUint16Record.empty(
           {required int fileNumber,
           required int recordNumber,
-          required int recordLength}) =>
-      ModbusFileRecord(
+          required int recordDataCount}) =>
+      ModbusFileUint16Record(
           fileNumber: fileNumber,
           recordNumber: recordNumber,
-          recordBytes: Uint8List(recordLength));
+          recordData: Uint16List(recordDataCount));
+}
+
+/// An Int6 file record type
+class ModbusFileInt16Record extends ModbusFileRecord {
+  @override
+  final Int16List recordData;
+  @override
+  ByteBuffer get recordBuffer => recordData.buffer;
+
+  ModbusFileInt16Record(
+      {required super.fileNumber,
+      required super.recordNumber,
+      required this.recordData});
+
+  factory ModbusFileInt16Record.empty(
+          {required int fileNumber,
+          required int recordNumber,
+          required int recordDataCount}) =>
+      ModbusFileInt16Record(
+          fileNumber: fileNumber,
+          recordNumber: recordNumber,
+          recordData: Int16List(recordDataCount));
+}
+
+/// A UIn32 file record type
+class ModbusFileUint32Record extends ModbusFileRecord {
+  @override
+  final Uint32List recordData;
+  @override
+  ByteBuffer get recordBuffer => recordData.buffer;
+
+  ModbusFileUint32Record(
+      {required super.fileNumber,
+      required super.recordNumber,
+      required this.recordData});
+
+  factory ModbusFileUint32Record.empty(
+          {required int fileNumber,
+          required int recordNumber,
+          required int recordDataCount}) =>
+      ModbusFileUint32Record(
+          fileNumber: fileNumber,
+          recordNumber: recordNumber,
+          recordData: Uint32List(recordDataCount));
+}
+
+/// An Int32 file record type
+class ModbusFileInt32Record extends ModbusFileRecord {
+  @override
+  final Int32List recordData;
+  @override
+  ByteBuffer get recordBuffer => recordData.buffer;
+
+  ModbusFileInt32Record(
+      {required super.fileNumber,
+      required super.recordNumber,
+      required this.recordData});
+
+  factory ModbusFileInt32Record.empty(
+          {required int fileNumber,
+          required int recordNumber,
+          required int recordDataCount}) =>
+      ModbusFileInt32Record(
+          fileNumber: fileNumber,
+          recordNumber: recordNumber,
+          recordData: Int32List(recordDataCount));
+}
+
+/// A Float file record type
+class ModbusFileFloatRecord extends ModbusFileRecord {
+  @override
+  final Float32List recordData;
+  @override
+  ByteBuffer get recordBuffer => recordData.buffer;
+
+  ModbusFileFloatRecord(
+      {required super.fileNumber,
+      required super.recordNumber,
+      required this.recordData});
+
+  factory ModbusFileFloatRecord.empty(
+          {required int fileNumber,
+          required int recordNumber,
+          required int recordDataCount}) =>
+      ModbusFileFloatRecord(
+          fileNumber: fileNumber,
+          recordNumber: recordNumber,
+          recordData: Float32List(recordDataCount));
+}
+
+/// A Double file record type
+class ModbusFileDoubleRecord extends ModbusFileRecord {
+  @override
+  final Float64List recordData;
+  @override
+  ByteBuffer get recordBuffer => recordData.buffer;
+
+  ModbusFileDoubleRecord(
+      {required super.fileNumber,
+      required super.recordNumber,
+      required this.recordData});
+
+  factory ModbusFileDoubleRecord.empty(
+          {required int fileNumber,
+          required int recordNumber,
+          required int recordDataCount}) =>
+      ModbusFileDoubleRecord(
+          fileNumber: fileNumber,
+          recordNumber: recordNumber,
+          recordData: Float64List(recordDataCount));
 }
 
 /// The read table records request.
-/// Max length of records is 35.
+/// Max length of records in bytes should not exceed 72 bytes.
 class ModbusFileRecordsReadRequest extends ModbusRequest {
   final List<ModbusFileRecord> fileRecords;
 
@@ -49,10 +170,16 @@ class ModbusFileRecordsReadRequest extends ModbusRequest {
   }
 
   static Uint8List _getProtocolDataUnit(List<ModbusFileRecord> fileRecords) {
-    if (fileRecords.isEmpty || fileRecords.length > 35) {
+    // PDU length checks
+    if (fileRecords.isEmpty) {
       throw ModbusException(
-          context: "ModbusFileRecordsRequest",
-          msg: "Invalid file records list, length must be between 1 and 35!");
+          context: "ModbusFileRecordsReadRequest",
+          msg: "File records list should not be empty!");
+    }
+    if (_getResponsePduLength(fileRecords) > 255) {
+      throw ModbusException(
+          context: "ModbusFileRecordsReadRequest",
+          msg: "File records list exceeds max length!");
     }
     // Request
     // -------
@@ -101,8 +228,9 @@ class ModbusFileRecordsReadRequest extends ModbusRequest {
         return ModbusResponseCode.requestRxFailed;
       }
       // Record data
-      for (int b = 0; b < record.recordLength; b++) {
-        record.recordBytes[b] = (pdu[i++] << 8) + pdu[i++];
+      var dataView = ByteData.view(record.recordBuffer);
+      for (int b = 0; b < record.recordLength * 2; b++) {
+        dataView.setUint8(b, pdu[i++]);
       }
     }
     return ModbusResponseCode.requestSucceed;
@@ -110,7 +238,7 @@ class ModbusFileRecordsReadRequest extends ModbusRequest {
 }
 
 /// The write table records request.
-/// Max length of records is 35.
+/// Max length of records in bytes should not exceed 72 bytes.
 class ModbusFileRecordsWriteRequest extends ModbusRequest {
   final List<ModbusFileRecord> fileRecords;
 
@@ -131,10 +259,16 @@ class ModbusFileRecordsWriteRequest extends ModbusRequest {
   }
 
   static Uint8List _getProtocolDataUnit(List<ModbusFileRecord> fileRecords) {
-    if (fileRecords.isEmpty || fileRecords.length > 35) {
+    // PDU length checks
+    if (fileRecords.isEmpty) {
       throw ModbusException(
-          context: "ModbusFileRecordsRequest",
-          msg: "Invalid file records list, length must be between 1 and 35!");
+          context: "ModbusFileRecordsWriteRequest",
+          msg: "File records list should not be empty!");
+    }
+    if (_getResponsePduLength(fileRecords) > 255) {
+      throw ModbusException(
+          context: "ModbusFileRecordsWriteRequest",
+          msg: "File records list exceeds max length!");
     }
     // Request
     // -------
@@ -160,10 +294,9 @@ class ModbusFileRecordsWriteRequest extends ModbusRequest {
       protocolDataUnit[i++] = hi(record.recordLength);
       protocolDataUnit[i++] = lo(record.recordLength);
       // Record data
-      for (int b = 0; b < record.recordLength; b++) {
-        var data = record.recordBytes[b];
-        protocolDataUnit[i++] = hi(data);
-        protocolDataUnit[i++] = lo(data);
+      var dataView = ByteData.view(record.recordBuffer);
+      for (int b = 0; b < record.recordLength * 2; b++) {
+        protocolDataUnit[i++] = dataView.getUint8(b);
       }
     }
     return protocolDataUnit;

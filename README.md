@@ -20,6 +20,7 @@ The split of the packages is done to minimize dependencies on your project.
 - **Connection timeout** (TCP only): specify a connection timeout for the [Modbus Client TCP](https://pub.dev/documentation/modbus_client_tcp/latest/modbus_client_tcp/ModbusClientTcp-class.html).
 - **Delay after connect** (TCP only): you can apply an optional delay after server connection. In some cases (e.g. Huawei SUN2000 inverter) the server will not respond if requests are sent right after the connection.  
 - **Element types**: this package offers a variety of element types: <a href="#NumericElements">ModbusNumRegister (int16, uint16, int32, uint32)</a>, <a href="#NumericElements">ModbusBitElement</a>, <a href="#EnumElements">ModbusEnumRegister</a>, <a href="#StatusElements">ModbusStatusRegister</a>, <a href="#BitMaskElements">ModbusBitMaskRegister</a>, <a href="#EpochElements">ModbusEpochRegister</a>.
+- **File records**: support <a href="#FileRecords">File Records</a> function code 0x14 and 0x15 of different types of numeric records <a href="#FileRecordTypes">(int16, uint16, int32, uint32, float and double)</a>.
 - **Group of elements**: in order to optimize request you can create <a href="#ElementGroups">group of elements</a>.
 - **Custom requests implementation**: you can easily implement custom request by overriding the [Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusRequest-class.html) class, assigning the request PDU (i.e. the protocolDataUnit) and override the **internalSetFromPduResponse** method or you override the [Element Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusElementRequest-class.html) class by overriding the **internalSetElementData** method.
 - **Logging**: Modbus Client libraries have logging enabled. You can activate logging with the root logger or by creating a [ModbusAppLogger](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusAppLogger-class.html) instance in your app. 
@@ -314,6 +315,56 @@ void main() async {
   print(batteryRegs[1]);
   print(batteryRegs[2]);
   print(batteryRegs[3]);
+
+  // Ending here
+  modbusClient.disconnect();
+}
+```
+
+# Modbus File Records <a id="FileRecords"></a>
+
+This library supports function codes 0x14 and 0x15 to read and write different types of numeric records.
+
+## File Record Types <a id="FileRecordTypes"></a>
+- **ModbusFileInt16Record**
+- **ModbusFileUint16Record**
+- **ModbusFileInt32Record**
+- **ModbusFileUint32Record**
+- **ModbusFileFloatRecord**
+- **ModbusFileDoubleRecord**
+
+``` dart
+import 'dart:typed_data';
+
+import 'package:logging/logging.dart';
+import 'package:modbus_client/modbus_client.dart';
+import 'package:modbus_client/src/modbus_file_record.dart';
+import 'package:modbus_client_tcp/modbus_client_tcp.dart';
+
+void main() async {
+  // Simple modbus logging
+  ModbusAppLogger(Level.FINE);
+
+  // Create the modbus client.
+  var modbusClient = ModbusClientTcp("127.0.0.1", unitId: 1);
+
+  // Write two file records
+  var r1 = ModbusFileUint16Record(
+      fileNumber: 4,
+      recordNumber: 1,
+      recordData: Uint16List.fromList([12573, 56312]));
+  var r2 = ModbusFileDoubleRecord(
+      fileNumber: 3,
+      recordNumber: 9,
+      recordData: Float64List.fromList([123.5634, 125756782.8492]));
+  await modbusClient.send(ModbusFileRecordsWriteRequest([r1, r2]));
+
+  // Read two file records
+  r1 = ModbusFileUint16Record.empty(
+      fileNumber: 4, recordNumber: 1, recordDataCount: 2);
+  r2 = ModbusFileDoubleRecord.empty(
+      fileNumber: 3, recordNumber: 9, recordDataCount: 2);
+  await modbusClient.send(ModbusFileRecordsReadRequest([r1, r2]));
 
   // Ending here
   modbusClient.disconnect();

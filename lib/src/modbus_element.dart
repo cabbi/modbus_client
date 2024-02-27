@@ -61,7 +61,7 @@ abstract class ModbusElement<T> {
       {bool rawValue = false, int? unitId, Duration? responseTimeout}) {
     if (type.writeSingleFunction == null) {
       throw ModbusException(
-          context: "ModbusBitElement",
+          context: "ModbusElement.getWriteRequest",
           msg: "$type element does not support write request!");
     }
     // Build the request object

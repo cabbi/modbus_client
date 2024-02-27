@@ -177,26 +177,25 @@ void main() async {
   // Simple modbus logging
   ModbusAppLogger(Level.FINE);
 
-  // Discover the Modbus server
-  var serverIp = await ModbusClientTcp.discover("192.168.0.0");
-  if (serverIp == null) {
-    ModbusAppLogger.shout("No modbus server found!");
-    return;
-  }
-
   // Create the modbus client.
-  var modbusClient = ModbusClientTcp(serverIp, unitId: 1);
+  var modbusClient = ModbusClientTcp("127.0.0.1", unitId: 1);
 
   // Write two file records
-  var r1 = ModbusFileRecord(
-      fileNumber: 4, recordNumber: 1, recordBytes: Uint8List.fromList([1, 2]));
-  var r2 = ModbusFileRecord(
-      fileNumber: 3, recordNumber: 9, recordBytes: Uint8List.fromList([3, 4]));
+  var r1 = ModbusFileUint16Record(
+      fileNumber: 4,
+      recordNumber: 1,
+      recordData: Uint16List.fromList([12573, 56312]));
+  var r2 = ModbusFileDoubleRecord(
+      fileNumber: 3,
+      recordNumber: 9,
+      recordData: Float64List.fromList([123.5634, 125756782.8492]));
   await modbusClient.send(ModbusFileRecordsWriteRequest([r1, r2]));
 
   // Read two file records
-  r1 = ModbusFileRecord.empty(fileNumber: 4, recordNumber: 1, recordLength: 2);
-  r2 = ModbusFileRecord.empty(fileNumber: 3, recordNumber: 9, recordLength: 2);
+  r1 = ModbusFileUint16Record.empty(
+      fileNumber: 4, recordNumber: 1, recordDataCount: 2);
+  r2 = ModbusFileDoubleRecord.empty(
+      fileNumber: 3, recordNumber: 9, recordDataCount: 2);
   await modbusClient.send(ModbusFileRecordsReadRequest([r1, r2]));
 
   // Ending here
