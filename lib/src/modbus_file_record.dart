@@ -16,6 +16,138 @@ abstract class ModbusFileRecord {
   ModbusFileRecord({required this.fileNumber, required this.recordNumber});
 }
 
+/// Record type used in multiple file records
+enum ModbusRecordType {
+  int16(1),
+  uint16(1),
+  int32(2),
+  uint32(2),
+  float(2),
+  double(4);
+
+  const ModbusRecordType(this.recordLength);
+  final int recordLength;
+}
+
+/// Modbus multiple file record types
+class ModbusFileMultipleRecord extends ModbusFileRecord {
+  late Uint16List _recordData;
+
+  @override
+  Uint16List get recordData => _recordData;
+
+  @override
+  ByteBuffer get recordBuffer => recordData.buffer;
+
+  ModbusFileMultipleRecord(
+      {required super.fileNumber,
+      required super.recordNumber,
+      Uint16List? recordData})
+      : _recordData = recordData ?? Uint16List(0);
+
+  factory ModbusFileMultipleRecord.empty(
+          {required int fileNumber,
+          required int recordNumber,
+          required int recordDataByteLength}) =>
+      ModbusFileMultipleRecord(
+          fileNumber: fileNumber,
+          recordNumber: recordNumber,
+          recordData: Uint16List(recordDataByteLength ~/ 2));
+
+  factory ModbusFileMultipleRecord.fromTypes(
+      {required int fileNumber,
+      required int recordNumber,
+      required Iterable<ModbusRecordType> types}) {
+    int recordsLength = 0;
+    for (var type in types) {
+      recordsLength += type.recordLength;
+    }
+    return ModbusFileMultipleRecord(
+        fileNumber: fileNumber,
+        recordNumber: recordNumber,
+        recordData: Uint16List(recordsLength));
+  }
+
+  int _currentBytePos = 0;
+  void start() => _currentBytePos = 0;
+
+  bool get endOfRecord => _endOfRecord(_currentBytePos);
+
+  bool _endOfRecord(int bytePos) => bytePos > 2 * recordData.length;
+
+  num? getNext(ModbusRecordType type) {
+    if (_endOfRecord(_currentBytePos + (type.recordLength * 2))) {
+      return null;
+    }
+    var dataView = ByteData.view(recordBuffer);
+    var pos = _currentBytePos;
+    _currentBytePos += type.recordLength * 2;
+    switch (type) {
+      case ModbusRecordType.int16:
+        return dataView.getInt16(pos);
+      case ModbusRecordType.uint16:
+        return dataView.getUint16(pos);
+      case ModbusRecordType.int32:
+        return dataView.getInt32(pos);
+      case ModbusRecordType.uint32:
+        return dataView.getUint32(pos);
+      case ModbusRecordType.float:
+        return dataView.getFloat32(pos);
+      case ModbusRecordType.double:
+        return dataView.getFloat64(pos);
+    }
+  }
+
+  void setNext(ModbusRecordType type, num value) {
+    if (_endOfRecord(_currentBytePos + 2 * type.recordLength)) {
+      throw ModbusException(
+          context: "ModbusFileMultipleRecord.setNext",
+          msg: "Setting value out of the record length");
+    }
+    var dataView = ByteData.view(recordBuffer);
+    var pos = _currentBytePos;
+    _currentBytePos += 2 * type.recordLength;
+    switch (type) {
+      case ModbusRecordType.int16:
+        dataView.setInt16(pos, value as int);
+        break;
+      case ModbusRecordType.uint16:
+        dataView.setUint16(pos, value as int);
+        break;
+      case ModbusRecordType.int32:
+        dataView.setInt32(pos, value as int);
+        break;
+      case ModbusRecordType.uint32:
+        dataView.setUint32(pos, value as int);
+        break;
+      case ModbusRecordType.float:
+        dataView.setFloat32(pos, value as double);
+        break;
+      case ModbusRecordType.double:
+        dataView.setFloat64(pos, value as double);
+        break;
+    }
+  }
+
+  void addNext(ModbusRecordType type, num value) {
+    _currentBytePos = _recordData.length * 2;
+    var currentData = _recordData;
+    _recordData = Uint16List(currentData.length + type.recordLength);
+    _recordData.setAll(0, currentData);
+    setNext(type, value);
+  }
+
+  ModbusFileRecordsReadRequest getReadRequest(
+          {int? unitId, Duration? responseTimeout}) =>
+      ModbusFileRecordsReadRequest([this],
+          unitId: unitId, responseTimeout: responseTimeout);
+
+  ModbusFileRecordsWriteRequest getWriteRequest(
+          {int? unitId, Duration? responseTimeout}) =>
+      ModbusFileRecordsWriteRequest([this],
+          unitId: unitId, responseTimeout: responseTimeout);
+}
+
 /// A UInt6 file record type
 class ModbusFileUint16Record extends ModbusFileRecord {
   @override

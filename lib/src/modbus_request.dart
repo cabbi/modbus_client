@@ -51,7 +51,7 @@ abstract class ModbusRequest {
     int functionCode = pduView.getUint8(0);
 
     // Any error code?
-    if (functionCode & 0x80 != 0) {
+    if ((functionCode & 0x80) != 0) {
       int exceptionCode = pduView.getUint8(1);
       setResponseCode(ModbusResponseCode.fromCode(exceptionCode));
       return;

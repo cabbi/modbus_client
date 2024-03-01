@@ -1,3 +1,7 @@
+## 1.1.2
+- Added 'ModbusFileMultipleRecord' class
+- Bug fix in response error code handling
+
 ## 1.1.1
 - Added Uint16, Int16, Uint32, Int32, Float and Double ModbusFileRecord types
 

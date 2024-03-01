@@ -5,6 +5,7 @@ export 'src/modbus_request.dart';
 export 'src/modbus_element.dart';
 export 'src/modbus_element_group.dart';
 export 'src/modbus_app_logger.dart';
+export 'src/modbus_file_record.dart';
 
 /// The Modbus standard function codes.
 enum ModbusFunctionCode {
