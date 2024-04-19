@@ -1,3 +1,11 @@
+## 1.2.0
+- Changed 'ModbusFunctionCode' from enum to class in order to add custom types
+- Changed 'ModbusElementType' from enum to class in order to add custom types
+- Added 'custom_request_example.dart' example
+- Changed ModbusRequest:
+  - 'protocolDataUnit' is now a getter and no more a final variable
+  - 'functionCode' is now of type 'FunctionCode'
+
 ## 1.1.2
 - Added 'ModbusFileMultipleRecord' class
 - Bug fix in response error code handling

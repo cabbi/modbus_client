@@ -62,7 +62,7 @@ abstract class ModbusNumRegister<T extends num> extends ModbusElement<T> {
       ..setUint16(3, 2) // value register count
       ..setUint8(5, 4) // value byte count
       ..setUint32(6, rawValue ? value : _getRawValue(value));
-    return ModbusWriteRequest(this, pdu,
+    return ModbusWriteRequest(this, pdu, type.writeMultipleFunction!,
         unitId: unitId, responseTimeout: responseTimeout);
   }
 
