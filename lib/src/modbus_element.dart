@@ -49,7 +49,7 @@ abstract class ModbusElement<T> {
       ..setUint8(0, type.readFunction.code)
       ..setUint16(1, address)
       ..setUint16(3, byteCount > 1 ? byteCount ~/ 2 : 1);
-    return ModbusReadRequest(this, pdu,
+    return ModbusReadRequest(this, pdu, type.readFunction,
         unitId: unitId, responseTimeout: responseTimeout);
   }
 
@@ -70,7 +70,7 @@ abstract class ModbusElement<T> {
       ..setUint8(0, type.writeSingleFunction!.code)
       ..setUint16(1, address)
       ..setUint16(3, rawValue ? value as int : _getRawValue(value));
-    return ModbusWriteRequest(this, pdu,
+    return ModbusWriteRequest(this, pdu, type.writeSingleFunction!,
         unitId: unitId, responseTimeout: responseTimeout);
   }
 

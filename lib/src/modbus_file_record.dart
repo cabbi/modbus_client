@@ -285,13 +285,20 @@ class ModbusFileDoubleRecord extends ModbusFileRecord {
 class ModbusFileRecordsReadRequest extends ModbusRequest {
   final List<ModbusFileRecord> fileRecords;
 
+  static FunctionCode recordsReadFunctionCode =
+      ModbusFunctionCode(0x14, FunctionType.custom);
+  @override
+  final FunctionCode functionCode = recordsReadFunctionCode;
+  @override
+  Uint8List get protocolDataUnit => _getProtocolDataUnit(fileRecords);
+
   @override
   final int responsePduLength;
 
   ModbusFileRecordsReadRequest(this.fileRecords,
       {super.unitId, super.responseTimeout})
       : responsePduLength = _getResponsePduLength(fileRecords),
-        super(_getProtocolDataUnit(fileRecords));
+        super();
 
   static int _getResponsePduLength(List<ModbusFileRecord> fileRecords) {
     int len = 2;
@@ -324,7 +331,7 @@ class ModbusFileRecordsReadRequest extends ModbusRequest {
     // Sub-Req. x+1, ...
     var protocolDataUnit = Uint8List(2 + 7 * fileRecords.length);
     int i = 0;
-    protocolDataUnit[i++] = 0x14;
+    protocolDataUnit[i++] = recordsReadFunctionCode.code;
     protocolDataUnit[i++] = 7 * fileRecords.length;
     for (var record in fileRecords) {
       protocolDataUnit[i++] = 6; // Reference type
@@ -339,8 +346,7 @@ class ModbusFileRecordsReadRequest extends ModbusRequest {
   }
 
   @override
-  ModbusResponseCode internalSetFromPduResponse(
-      int functionCode, Uint8List pdu) {
+  ModbusResponseCode internalSetFromPduResponse(Uint8List pdu) {
     // Response
     // --------
     // Function code 1 Byte 0x14
@@ -349,7 +355,7 @@ class ModbusFileRecordsReadRequest extends ModbusRequest {
     // Sub-Req. x, Reference Type 1 Byte 6
     // Sub-Req. x, Record Data N x 2 Bytes
     // Sub-Req. x+1, ...
-    if (pdu.length != responsePduLength || pdu[0] != functionCode) {
+    if (pdu.length != responsePduLength || pdu[0] != functionCode.code) {
       return ModbusResponseCode.requestRxFailed;
     }
     int i = 2;
@@ -374,13 +380,20 @@ class ModbusFileRecordsReadRequest extends ModbusRequest {
 class ModbusFileRecordsWriteRequest extends ModbusRequest {
   final List<ModbusFileRecord> fileRecords;
 
+  static FunctionCode recordsWriteFunctionCode =
+      ModbusFunctionCode(0x15, FunctionType.custom);
+  @override
+  final FunctionCode functionCode = recordsWriteFunctionCode;
+  @override
+  Uint8List get protocolDataUnit => _getProtocolDataUnit(fileRecords);
+
   @override
   final int responsePduLength;
 
   ModbusFileRecordsWriteRequest(this.fileRecords,
       {super.unitId, super.responseTimeout})
       : responsePduLength = _getResponsePduLength(fileRecords),
-        super(_getProtocolDataUnit(fileRecords));
+        super();
 
   static int _getResponsePduLength(List<ModbusFileRecord> fileRecords) {
     int len = 2;
@@ -415,7 +428,7 @@ class ModbusFileRecordsWriteRequest extends ModbusRequest {
     int reqDataLength = _getResponsePduLength(fileRecords) - 2;
     var protocolDataUnit = Uint8List(2 + reqDataLength);
     int i = 0;
-    protocolDataUnit[i++] = 0x15;
+    protocolDataUnit[i++] = recordsWriteFunctionCode.code;
     protocolDataUnit[i++] = reqDataLength;
     for (var record in fileRecords) {
       protocolDataUnit[i++] = 6; // Reference type
@@ -435,8 +448,7 @@ class ModbusFileRecordsWriteRequest extends ModbusRequest {
   }
 
   @override
-  ModbusResponseCode internalSetFromPduResponse(
-      int functionCode, Uint8List pdu) {
+  ModbusResponseCode internalSetFromPduResponse(Uint8List pdu) {
     // Response is echo of request
     return ModbusResponseCode.requestSucceed;
   }

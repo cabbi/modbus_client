@@ -54,7 +54,7 @@ class ModbusElementsGroup extends Iterable<ModbusElement> {
       ..setUint8(0, _type!.readFunction.code)
       ..setUint16(1, _startAddress)
       ..setUint16(3, _addressRange);
-    return ModbusReadGroupRequest(this, pdu,
+    return ModbusReadGroupRequest(this, pdu, _type!.readFunction,
         unitId: unitId, responseTimeout: responseTimeout);
   }
 

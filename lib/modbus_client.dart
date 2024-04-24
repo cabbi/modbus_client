@@ -7,46 +7,58 @@ export 'src/modbus_element_group.dart';
 export 'src/modbus_app_logger.dart';
 export 'src/modbus_file_record.dart';
 
+enum FunctionType { read, writeSingle, writeMultiple, custom }
+
+abstract class FunctionCode {
+  int get code;
+  FunctionType get type;
+}
+
 /// The Modbus standard function codes.
-enum ModbusFunctionCode {
-  readCoils(0x01),
-  readDiscreteInputs(0x02),
-  readHoldingRegisters(0x03),
-  readInputRegisters(0x04),
-  writeSingleCoil(0x05),
-  writeSingleHoldingRegister(0x06),
-  writeMultipleCoils(0x0F),
-  writeMultipleHoldingRegisters(0x10);
+class ModbusFunctionCode implements FunctionCode {
+  static const ModbusFunctionCode readCoils =
+      ModbusFunctionCode(0x01, FunctionType.read);
+  static const ModbusFunctionCode readDiscreteInputs =
+      ModbusFunctionCode(0x02, FunctionType.read);
+  static const ModbusFunctionCode readHoldingRegisters =
+      ModbusFunctionCode(0x03, FunctionType.read);
+  static const ModbusFunctionCode readInputRegisters =
+      ModbusFunctionCode(0x04, FunctionType.read);
+  static const ModbusFunctionCode writeSingleCoil =
+      ModbusFunctionCode(0x05, FunctionType.writeSingle);
+  static const ModbusFunctionCode writeSingleHoldingRegister =
+      ModbusFunctionCode(0x06, FunctionType.writeSingle);
+  static const ModbusFunctionCode writeMultipleCoils =
+      ModbusFunctionCode(0x0F, FunctionType.writeMultiple);
+  static const ModbusFunctionCode writeMultipleHoldingRegisters =
+      ModbusFunctionCode(0x10, FunctionType.writeMultiple);
 
-  const ModbusFunctionCode(this.code);
+  @override
   final int code;
+  @override
+  final FunctionType type;
 
-  bool get isRead => isReadFunction(code);
-  bool get isWrite => isWriteFunction(code);
-  bool get isWriteSingle => isWriteSingleFunction(code);
-  bool get isWriteMultiple => isWriteMultipleFunction(code);
-
-  static bool isReadFunction(code) => 0x00 < code && code <= 0x04;
-  static bool isWriteFunction(code) => 0x04 < code && code <= 0x10;
-  static bool isWriteSingleFunction(code) => code == 0x05 || code == 0x06;
-  static bool isWriteMultipleFunction(code) => code == 0x0F || code == 0x10;
-  static bool isSpecialFunction(code) => code > 0x10;
+  const ModbusFunctionCode(this.code, this.type);
 }
 
 /// The Modbus element types.
-enum ModbusElementType {
+class ModbusElementType {
   /// Single bit [Read-Only]
-  discreteInput(ModbusFunctionCode.readDiscreteInputs),
+  static const ModbusElementType discreteInput =
+      ModbusElementType(ModbusFunctionCode.readDiscreteInputs);
 
   /// Single bit [Read-Write]
-  coil(ModbusFunctionCode.readCoils, ModbusFunctionCode.writeSingleCoil,
-      ModbusFunctionCode.writeMultipleCoils),
+  static const ModbusElementType coil = ModbusElementType(
+      ModbusFunctionCode.readCoils,
+      ModbusFunctionCode.writeSingleCoil,
+      ModbusFunctionCode.writeMultipleCoils);
 
   /// 16-bit word [Read-Only]
-  inputRegister(ModbusFunctionCode.readInputRegisters),
+  static const ModbusElementType inputRegister =
+      ModbusElementType(ModbusFunctionCode.readInputRegisters);
 
   /// 16-bit word [Read-Write]
-  holdingRegister(
+  static const ModbusElementType holdingRegister = ModbusElementType(
       ModbusFunctionCode.readHoldingRegisters,
       ModbusFunctionCode.writeSingleHoldingRegister,
       ModbusFunctionCode.writeMultipleHoldingRegisters);
@@ -54,9 +66,9 @@ enum ModbusElementType {
   const ModbusElementType(this.readFunction,
       [this.writeSingleFunction, this.writeMultipleFunction]);
 
-  final ModbusFunctionCode readFunction;
-  final ModbusFunctionCode? writeSingleFunction;
-  final ModbusFunctionCode? writeMultipleFunction;
+  final FunctionCode readFunction;
+  final FunctionCode? writeSingleFunction;
+  final FunctionCode? writeMultipleFunction;
 
   /// True if the element type represents a registry type
   bool get isRegister =>

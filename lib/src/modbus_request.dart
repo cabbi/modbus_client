@@ -7,7 +7,7 @@ import 'package:modbus_client/modbus_client.dart';
 ///
 /// For each Modbus request, a PDU response function code + 0x80
 /// means the request has an exception.
-/// The [ModbusResponseCode] enum defines possible modbus Exception.
+/// The [ModbusResponseCode] defines possible modbus Exception.
 ///
 /// Exception response PDU
 /// ----------------------
@@ -16,12 +16,12 @@ import 'package:modbus_client/modbus_client.dart';
 abstract class ModbusRequest {
   final int? unitId;
   final Duration? responseTimeout;
-  final Uint8List protocolDataUnit;
-  int get functionCode => protocolDataUnit[0];
+  Uint8List get protocolDataUnit;
+  FunctionCode get functionCode;
   int get responsePduLength;
   late Completer<ModbusResponseCode> _responseCompleter;
 
-  ModbusRequest(this.protocolDataUnit, {this.unitId, this.responseTimeout}) {
+  ModbusRequest({this.unitId, this.responseTimeout}) {
     if (protocolDataUnit.isEmpty) {
       throw ModbusException(
           context: "ModbusRequest",
@@ -58,29 +58,26 @@ abstract class ModbusRequest {
     }
 
     // Response completed!
-    setResponseCode(internalSetFromPduResponse(functionCode, pdu));
+    setResponseCode(internalSetFromPduResponse(pdu));
   }
 
-  ModbusResponseCode internalSetFromPduResponse(
-          int functionCode, Uint8List pdu) =>
+  ModbusResponseCode internalSetFromPduResponse(Uint8List pdu) =>
       ModbusResponseCode.requestSucceed;
 }
 
 /// A request for a modbus element.
 abstract class ModbusElementRequest extends ModbusRequest {
-  ModbusElementRequest(super.protocolDataUnit,
-      {super.unitId, super.responseTimeout});
+  ModbusElementRequest({super.unitId, super.responseTimeout});
 
   @override
-  ModbusResponseCode internalSetFromPduResponse(
-      int functionCode, Uint8List pdu) {
+  ModbusResponseCode internalSetFromPduResponse(Uint8List pdu) {
     // Assign response data
-    if (ModbusFunctionCode.isReadFunction(functionCode)) {
+    if (functionCode.type == FunctionType.read) {
       internalSetElementData(pdu.sublist(2));
-    } else if (ModbusFunctionCode.isWriteSingleFunction(functionCode)) {
+    } else if (functionCode.type == FunctionType.writeSingle) {
       internalSetElementData(pdu.sublist(3));
     }
-    if (ModbusFunctionCode.isWriteMultipleFunction(functionCode)) {
+    if (functionCode.type == FunctionType.writeMultiple) {
       internalSetElementData(protocolDataUnit.sublist(6));
     }
     return ModbusResponseCode.requestSucceed;
@@ -104,8 +101,12 @@ class ModbusReadRequest extends ModbusElementRequest {
   // BYTE - Byte Count
   // N BYTES - Element Values
 
+  @override
+  final FunctionCode functionCode;
+  @override
+  final Uint8List protocolDataUnit;
   final ModbusElement element;
-  ModbusReadRequest(this.element, super.protocolDataUnit,
+  ModbusReadRequest(this.element, this.protocolDataUnit, this.functionCode,
       {super.unitId, super.responseTimeout});
 
   @override
@@ -131,8 +132,13 @@ class ModbusReadGroupRequest extends ModbusElementRequest {
   // BYTE - Byte Count
   // N BYTES - Element Values
 
+  @override
+  final FunctionCode functionCode;
+  @override
+  final Uint8List protocolDataUnit;
   final ModbusElementsGroup elementGroup;
-  ModbusReadGroupRequest(this.elementGroup, super.protocolDataUnit,
+  ModbusReadGroupRequest(
+      this.elementGroup, this.protocolDataUnit, this.functionCode,
       {super.unitId, super.responseTimeout});
 
   @override
@@ -163,8 +169,12 @@ class ModbusReadGroupRequest extends ModbusElementRequest {
 
 /// A write request of a single element.
 class ModbusWriteRequest extends ModbusElementRequest {
+  @override
+  final FunctionCode functionCode;
+  @override
+  final Uint8List protocolDataUnit;
   final ModbusElement element;
-  ModbusWriteRequest(this.element, super.protocolDataUnit,
+  ModbusWriteRequest(this.element, this.protocolDataUnit, this.functionCode,
       {super.unitId, super.responseTimeout});
 
   // Request PDU
