@@ -35,6 +35,12 @@
             "program": "example\\file_records_request_example.dart"
         },
         {
+            "name": "bytes register example",
+            "request": "launch",
+            "type": "dart",
+            "program": "example\\bytes_register_example.dart"
+        },
+        {
             "name": "Huawei SUN2000 example",
             "request": "launch",
             "type": "dart",

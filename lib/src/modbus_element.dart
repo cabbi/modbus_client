@@ -11,6 +11,7 @@ part 'element_type/modbus_element_enum.dart';
 part 'element_type/modbus_element_status.dart';
 part 'element_type/modbus_element_bitmask.dart';
 part 'element_type/modbus_element_epoch.dart';
+part 'element_type/modbus_element_bytes.dart';
 
 /// The base element class
 abstract class ModbusElement<T> {
@@ -69,12 +70,12 @@ abstract class ModbusElement<T> {
     ByteData.view(pdu.buffer)
       ..setUint8(0, type.writeSingleFunction!.code)
       ..setUint16(1, address)
-      ..setUint16(3, rawValue ? value as int : _getRawValue(value));
+      ..setUint16(3, rawValue ? value as int : _getRawValue(value) as int);
     return ModbusWriteRequest(this, pdu, type.writeSingleFunction!,
         unitId: unitId, responseTimeout: responseTimeout);
   }
 
-  int _getRawValue(dynamic value);
+  dynamic _getRawValue(dynamic value);
 
   @override
   String toString() =>
