@@ -1,6 +1,14 @@
 part of '../modbus_element.dart';
 
 /// This register type reads and writes byte array.
+///
+/// The [byteCount] cannot exceed 250 bytes which is the multiple read
+/// bytes limit for Modbus/RTU. Note that the protocol limit depends on multiple
+/// factors:
+///  - Read & Write have different limits
+///  - Modbus RTU and TCP have different limits
+///  - Device dependent limits
+/// To get the right limit please refer to Modbus specs and your device manual.
 class ModbusBytesRegister extends ModbusElement<Uint8List> {
   ModbusBytesRegister({
     required super.name,
@@ -15,6 +23,12 @@ class ModbusBytesRegister extends ModbusElement<Uint8List> {
       throw ModbusException(
           context: "ModbusBytesRegister",
           msg: "'byteCount' must be an even number!");
+    }
+    // Expecting length not bigger than 250
+    if (byteCount > 250) {
+      throw ModbusException(
+          context: "ModbusBytesRegister",
+          msg: "'byteCount' must not be greater than 250!");
     }
   }
 
