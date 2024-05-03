@@ -1,3 +1,6 @@
+## 1.2.1
+- Added 'ModbusBytesRegister' class
+
 ## 1.2.0
 - Changed 'ModbusFunctionCode' from enum to class in order to add custom types
 - Changed 'ModbusElementType' from enum to class in order to add custom types

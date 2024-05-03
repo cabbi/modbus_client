@@ -19,7 +19,7 @@ The split of the packages is done to minimize dependencies on your project.
 - **Server discovery** (TCP only): discovers the modbus server from a starting IP address [Modbus Client TCP](https://pub.dev/documentation/modbus_client_tcp/latest/modbus_client_tcp/ModbusClientTcp/discover.html).
 - **Connection timeout** (TCP only): specify a connection timeout for the [Modbus Client TCP](https://pub.dev/documentation/modbus_client_tcp/latest/modbus_client_tcp/ModbusClientTcp-class.html).
 - **Delay after connect** (TCP only): you can apply an optional delay after server connection. In some cases (e.g. Huawei SUN2000 inverter) the server will not respond if requests are sent right after the connection.  
-- **Element types**: this package offers a variety of element types: <a href="#NumericElements">ModbusNumRegister (int16, uint16, int32, uint32)</a>, <a href="#NumericElements">ModbusBitElement</a>, <a href="#EnumElements">ModbusEnumRegister</a>, <a href="#StatusElements">ModbusStatusRegister</a>, <a href="#BitMaskElements">ModbusBitMaskRegister</a>, <a href="#EpochElements">ModbusEpochRegister</a>.
+- **Element types**: this package offers a variety of element types: <a href="#NumericElements">ModbusNumRegister (int16, uint16, int32, uint32)</a>, <a href="#NumericElements">ModbusBitElement</a>, <a href="#EnumElements">ModbusEnumRegister</a>, <a href="#StatusElements">ModbusStatusRegister</a>, <a href="#BitMaskElements">ModbusBitMaskRegister</a>, <a href="#EpochElements">ModbusEpochRegister</a>, <a href="#BytesElements">ModbusBytesRegister</a>.
 - **File records**: support <a href="#FileRecords">File Records</a> function code 0x14 and 0x15 of different types of numeric records <a href="#FileRecordTypes">(int16, uint16, int32, uint32, float and double)</a>.
 - **Group of elements**: in order to optimize request you can create <a href="#ElementGroups">group of elements</a>.
 - **Custom requests implementation**: you can easily implement custom request by overriding the [Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusRequest-class.html) class, assigning the request PDU (i.e. the protocolDataUnit) and override the **internalSetFromPduResponse** method or you override the [Element Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusElementRequest-class.html) class by overriding the **internalSetElementData** method.
@@ -253,6 +253,50 @@ ModbusEpochRegister(
     type: ModbusElementType.holdingRegister,
     address: 32091,
     isUtc: false);
+```
+
+## Epoch/DateTime Element <a id="EpochElements"></a>
+
+Use **ModbusEpochRegister** if your device holds timestamp values as [Epoch/Unix time](https://en.wikipedia.org/wiki/Unix_time) in seconds.
+
+``` dart
+ModbusEpochRegister(
+    name: "Startup time",
+    type: ModbusElementType.holdingRegister,
+    address: 32091,
+    isUtc: false);
+```
+
+## Bytes Array Element <a id="BytesElements"></a>
+
+Use **ModbusBytesRegister** if you want to read and write multiple bytes/registers at a time.
+Note that **byteCount** cannot exceed 250 bytes which is the multiple read bytes limit for Modbus/RTU. 
+Note that the protocol limit depends on multiple factors:
+ - Read & Write have different limits
+ - Modbus RTU and TCP have different limits
+ - Device dependent limits
+To get the right limit please refer to Modbus specs and your device manual.
+
+``` dart
+var bytesRegister = ModbusBytesRegister(
+    name: "BytesArray",
+    address: 4,
+    byteCount: 10,
+    onUpdate: (self) => print(self));
+
+// Create the modbus client.
+var modbusClient = ModbusClientTcp("127.0.0.1", unitId: 1);
+
+var req1 = bytesRegister.getWriteRequest(Uint8List.fromList(
+    [0x01, 0x02, 0x03, 0x04, 0x05, 0x66, 0x07, 0x08, 0x09, 0x0A]));
+var res = await modbusClient.send(req1);
+print(res);
+
+var req2 = bytesRegister.getReadRequest();
+res = await modbusClient.send(req2);
+print(bytesRegister.value);
+
+modbusClient.disconnect();
 ```
 
 ## Element Group <a id="ElementGroups"></a>
