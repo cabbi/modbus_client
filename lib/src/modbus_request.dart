@@ -19,9 +19,13 @@ abstract class ModbusRequest {
   Uint8List get protocolDataUnit;
   FunctionCode get functionCode;
   int get responsePduLength;
+  ModbusEndianness endianness;
   late Completer<ModbusResponseCode> _responseCompleter;
 
-  ModbusRequest({this.unitId, this.responseTimeout}) {
+  ModbusRequest(
+      {this.unitId,
+      this.responseTimeout,
+      this.endianness = ModbusEndianness.ABCD}) {
     if (protocolDataUnit.isEmpty) {
       throw ModbusException(
           context: "ModbusRequest",
@@ -67,7 +71,7 @@ abstract class ModbusRequest {
 
 /// A request for a modbus element.
 abstract class ModbusElementRequest extends ModbusRequest {
-  ModbusElementRequest({super.unitId, super.responseTimeout});
+  ModbusElementRequest({super.unitId, super.responseTimeout, super.endianness});
 
   @override
   ModbusResponseCode internalSetFromPduResponse(Uint8List pdu) {
@@ -107,14 +111,14 @@ class ModbusReadRequest extends ModbusElementRequest {
   final Uint8List protocolDataUnit;
   final ModbusElement element;
   ModbusReadRequest(this.element, this.protocolDataUnit, this.functionCode,
-      {super.unitId, super.responseTimeout});
+      {super.unitId, super.responseTimeout, super.endianness});
 
   @override
   int get responsePduLength => 2 + element.byteCount;
 
   @override
   void internalSetElementData(Uint8List data) {
-    element.setValueFromBytes(data);
+    element.setValueFromBytes(endianness.getEndianBytes(data));
   }
 }
 
@@ -139,7 +143,7 @@ class ModbusReadGroupRequest extends ModbusElementRequest {
   final ModbusElementsGroup elementGroup;
   ModbusReadGroupRequest(
       this.elementGroup, this.protocolDataUnit, this.functionCode,
-      {super.unitId, super.responseTimeout});
+      {super.unitId, super.responseTimeout, super.endianness});
 
   @override
   int get responsePduLength =>
@@ -175,7 +179,7 @@ class ModbusWriteRequest extends ModbusElementRequest {
   final Uint8List protocolDataUnit;
   final ModbusElement element;
   ModbusWriteRequest(this.element, this.protocolDataUnit, this.functionCode,
-      {super.unitId, super.responseTimeout});
+      {super.unitId, super.responseTimeout, super.endianness});
 
   // Request PDU
   // -----------
@@ -194,7 +198,7 @@ class ModbusWriteRequest extends ModbusElementRequest {
 
   @override
   void internalSetElementData(Uint8List data) {
-    element.setValueFromBytes(data);
+    element.setValueFromBytes(endianness.getEndianBytes(data));
   }
 }
 

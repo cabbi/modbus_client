@@ -1,3 +1,8 @@
+## 1.3.0
+- Added 'ModbusEndianess' handling for numeric registers
+- Added 'ModbusFloatRegister' and 'ModbusDoubleRegister' registers
+- 'address' field is no more final
+
 ## 1.2.1
 - Added 'ModbusBytesRegister' class
 
