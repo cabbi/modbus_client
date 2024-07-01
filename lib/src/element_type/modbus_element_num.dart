@@ -107,9 +107,7 @@ class ModbusUint16Register extends ModbusNumRegister {
       : super(byteCount: 2);
 
   @override
-  int _fromBytes(Uint8List bytes) => endianness
-      .getEndianBytes(bytes)
-      .buffer
+  int _fromBytes(Uint8List bytes) => bytes.buffer
       .asByteData()
       .getUint16(0, endianness.swapByte ? Endian.little : Endian.big);
 
@@ -134,8 +132,7 @@ class ModbusInt32Register extends ModbusNumRegister {
       : super(byteCount: 4);
 
   @override
-  int _fromBytes(Uint8List bytes) =>
-      endianness.getEndianBytes(bytes).buffer.asByteData().getInt32(0);
+  int _fromBytes(Uint8List bytes) => bytes.buffer.asByteData().getInt32(0);
 
   @override
   Uint8List _toBytes(dynamic value) =>
@@ -158,8 +155,7 @@ class ModbusUint32Register extends ModbusNumRegister {
       : super(byteCount: 4);
 
   @override
-  int _fromBytes(Uint8List bytes) =>
-      endianness.getEndianBytes(bytes).buffer.asByteData().getUint32(0);
+  int _fromBytes(Uint8List bytes) => bytes.buffer.asByteData().getUint32(0);
 
   @override
   Uint8List _toBytes(dynamic value) =>
@@ -185,8 +181,7 @@ class ModbusFloatRegister extends ModbusNumRegister<double> {
   double _getRawValue(dynamic value) => (value - offset) / multiplier;
 
   @override
-  double _fromBytes(Uint8List bytes) =>
-      endianness.getEndianBytes(bytes).buffer.asByteData().getFloat32(0);
+  double _fromBytes(Uint8List bytes) => bytes.buffer.asByteData().getFloat32(0);
 
   @override
   Uint8List _toBytes(dynamic value) =>
@@ -212,8 +207,7 @@ class ModbusDoubleRegister extends ModbusNumRegister<double> {
   double _getRawValue(dynamic value) => (value - offset) / multiplier;
 
   @override
-  double _fromBytes(Uint8List bytes) =>
-      endianness.getEndianBytes(bytes).buffer.asByteData().getFloat64(0);
+  double _fromBytes(Uint8List bytes) => bytes.buffer.asByteData().getFloat64(0);
 
   @override
   Uint8List _toBytes(dynamic value) =>

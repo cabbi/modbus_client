@@ -1,6 +1,5 @@
 library modbus_element;
 
-import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:modbus_client/modbus_client.dart';
