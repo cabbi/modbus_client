@@ -60,7 +60,10 @@ class ModbusBytesRegister extends ModbusElement<Uint8List> {
 
   @override
   ModbusWriteRequest getWriteRequest(dynamic value,
-      {bool rawValue = false, int? unitId, Duration? responseTimeout}) {
+      {bool rawValue = false,
+      int? unitId,
+      Duration? responseTimeout,
+      ModbusEndianness? endianness}) {
     // Expecting a Uint8List object
     if (value is! Uint8List) {
       throw ModbusException(
@@ -79,15 +82,9 @@ class ModbusBytesRegister extends ModbusElement<Uint8List> {
           context: "ModbusBytesRegister.getWriteRequest",
           msg: "ModbusBytesRegister requires 'writeMultipleFunction' code!");
     }
-    // Build the request object
-    var pdu = Uint8List(6 + value.length);
-    pdu.setAll(6, value);
-    ByteData.view(pdu.buffer)
-      ..setUint8(0, type.writeMultipleFunction!.code)
-      ..setUint16(1, address)
-      ..setUint16(3, value.length ~/ 2) // value register count
-      ..setUint8(5, value.length); // value byte count
-    return ModbusWriteRequest(this, pdu, type.writeMultipleFunction!,
-        unitId: unitId, responseTimeout: responseTimeout);
+    return getMultipleWriteRequest(value,
+        unitId: unitId,
+        responseTimeout: responseTimeout,
+        endianness: endianness);
   }
 }

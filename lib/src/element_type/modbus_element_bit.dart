@@ -22,9 +22,15 @@ class ModbusBitElement extends ModbusElement<bool> {
 
   /// NOTE: [rawValue] is ignored for bit elements!
   ModbusWriteRequest getWriteRequest(dynamic value,
-      {bool rawValue = false, int? unitId, Duration? responseTimeout}) {
+      {bool rawValue = false,
+      int? unitId,
+      Duration? responseTimeout,
+      ModbusEndianness? endianness}) {
     return super.getWriteRequest(value,
-        rawValue: false, unitId: unitId, responseTimeout: responseTimeout);
+        rawValue: false,
+        unitId: unitId,
+        responseTimeout: responseTimeout,
+        endianness: endianness);
   }
 
   @override

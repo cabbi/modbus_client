@@ -1,4 +1,8 @@
+// ignore_for_file: constant_identifier_names
+
 library modbus_client;
+
+import 'dart:typed_data';
 
 export 'src/modbus_client.dart';
 export 'src/modbus_request.dart';
@@ -142,6 +146,56 @@ enum ModbusConnectionMode {
   /// Client will be connected if not already before sending the
   /// requests. After request has been sent, client is disconnected.
   autoConnectAndKeepConnected,
+}
+
+/// The type of endianness applied to number conversions
+enum ModbusEndianness {
+  ABCD(swapWord: false, swapByte: false),
+  CDAB(swapWord: true, swapByte: false),
+  BADC(swapWord: false, swapByte: true),
+  DCBA(swapWord: true, swapByte: true);
+
+  final bool swapWord;
+  final bool swapByte;
+
+  const ModbusEndianness({required this.swapWord, required this.swapByte});
+
+  factory ModbusEndianness.from(
+      {required bool swapWord, required bool swapByte}) {
+    if (swapWord) {
+      return swapByte ? DCBA : CDAB;
+    } else {
+      return swapByte ? BADC : ABCD;
+    }
+  }
+
+  Uint8List getEndianBytes(Uint8List bytes) {
+    var len = bytes.lengthInBytes;
+    if (swapWord && swapByte) {
+      for (int i = 0; i < len ~/ 2; i++) {
+        var byte = bytes[i];
+        bytes[i] = bytes[len - i - 1];
+        bytes[len - i - 1] = byte;
+      }
+    } else if (swapByte) {
+      for (int i = 0; i < len; i += 2) {
+        var byte = bytes[i];
+        bytes[i] = bytes[i + 1];
+        bytes[i + 1] = byte;
+      }
+    } else if (swapWord) {
+      for (int i = 0; i < len ~/ 2; i++) {
+        var byte = bytes[i];
+        bytes[i] = bytes[len - i - 2];
+        bytes[len - i - 2] = byte;
+        i++;
+        byte = bytes[i];
+        bytes[i] = bytes[len - i];
+        bytes[len - i] = byte;
+      }
+    }
+    return bytes;
+  }
 }
 
 /// The modbus_client package base [Exception] class.
