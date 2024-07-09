@@ -21,6 +21,11 @@ The split of the packages is done to minimize dependencies on your project.
 - **Delay after connect** (TCP only): you can apply an optional delay after server connection. In some cases (e.g. Huawei SUN2000 inverter) the server will not respond if requests are sent right after the connection.  
 - **Element types**: this package offers a variety of element types: <a href="#NumericElements">ModbusNumRegister (int16, uint16, int32, uint32)</a>, <a href="#NumericElements">ModbusBitElement</a>, <a href="#EnumElements">ModbusEnumRegister</a>, <a href="#StatusElements">ModbusStatusRegister</a>, <a href="#BitMaskElements">ModbusBitMaskRegister</a>, <a href="#EpochElements">ModbusEpochRegister</a>, <a href="#BytesElements">ModbusBytesRegister</a>.
 - **File records**: support <a href="#FileRecords">File Records</a> function code 0x14 and 0x15 of different types of numeric records <a href="#FileRecordTypes">(int16, uint16, int32, uint32, float and double)</a>.
+- **Endianness**: Define how bytes are arranged in the modbus register.
+  - ABCD(swapWord: false, swapByte: false)
+  - CDAB(swapWord: true, swapByte: false)
+  - BADC(swapWord: false, swapByte: true)
+  - DCBA(swapWord: true, swapByte: true)
 - **Group of elements**: in order to optimize request you can create <a href="#ElementGroups">group of elements</a>.
 - **Custom requests implementation**: you can easily implement custom request by overriding the [Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusRequest-class.html) class, assigning the request PDU (i.e. the protocolDataUnit) and override the **internalSetFromPduResponse** method or you override the [Element Request](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusElementRequest-class.html) class by overriding the **internalSetElementData** method.
 - **Logging**: Modbus Client libraries have logging enabled. You can activate logging with the root logger or by creating a [ModbusAppLogger](https://pub.dev/documentation/modbus_client/latest/modbus_client/ModbusAppLogger-class.html) instance in your app. 
@@ -126,6 +131,8 @@ Typical elements are simple bit and numeric values:
 - **ModbusUint16Register**
 - **ModbusInt32Register**
 - **ModbusUint32Register**
+- **ModbusFloatRegister**
+- **ModbusDoubleRegister**
 
 Numeric elements have an **uom** (i.e. unit of measure), a **multiplier** and **offset** to make conversion from raw to engineering values (i.e. value = read_value*multiplier + offset), and **viewDecimalPlaces** to print out only needed decimals.
 
