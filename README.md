@@ -1,8 +1,9 @@
 # Introduction
-This is a set of three packages implementing Modbus Client sending requests to a remote device (i.e. Modbus Server).
+This is a set of packages implementing Modbus Client sending requests to a remote device (i.e. Modbus Server).
 
-- [Modbus Client](https://pub.dev/packages/modbus_client) is the base implementation for the **TCP** and **Serial** packages.
+- [Modbus Client](https://pub.dev/packages/modbus_client) is the base implementation for the **TCP/UDP** and **Serial** packages.
 - [Modbus Client TCP](https://pub.dev/packages/modbus_client_tcp) implements the **TCP** protocol to send requests via **ethernet networks**.
+- [Modbus Client UDP](https://pub.dev/packages/modbus_client_udp) implements the **UDP** protocol to send requests via **ethernet networks**.
 - [Modbus Client Serial](https://pub.dev/packages/modbus_client_serial) implements the **ASCII** and **RTU** protocols to send requests via **Serial Port**
 
 The split of the packages is done to minimize dependencies on your project.
@@ -19,7 +20,7 @@ The split of the packages is done to minimize dependencies on your project.
 - **Server discovery** (TCP only): discovers the modbus server from a starting IP address [Modbus Client TCP](https://pub.dev/documentation/modbus_client_tcp/latest/modbus_client_tcp/ModbusClientTcp/discover.html).
 - **Connection timeout** (TCP only): specify a connection timeout for the [Modbus Client TCP](https://pub.dev/documentation/modbus_client_tcp/latest/modbus_client_tcp/ModbusClientTcp-class.html).
 - **Delay after connect** (TCP only): you can apply an optional delay after server connection. In some cases (e.g. Huawei SUN2000 inverter) the server will not respond if requests are sent right after the connection.  
-- **Element types**: this package offers a variety of element types: <a href="#NumericElements">ModbusNumRegister (int16, uint16, int32, uint32)</a>, <a href="#NumericElements">ModbusBitElement</a>, <a href="#EnumElements">ModbusEnumRegister</a>, <a href="#StatusElements">ModbusStatusRegister</a>, <a href="#BitMaskElements">ModbusBitMaskRegister</a>, <a href="#EpochElements">ModbusEpochRegister</a>, <a href="#BytesElements">ModbusBytesRegister</a>.
+- **Element types**: this package offers a variety of element types: <a href="#NumericElements">ModbusNumRegister (int16, uint16, int32, uint32, int64, uint64, float and double)</a>, <a href="#NumericElements">ModbusBitElement</a>, <a href="#EnumElements">ModbusEnumRegister</a>, <a href="#StatusElements">ModbusStatusRegister</a>, <a href="#BitMaskElements">ModbusBitMaskRegister</a>, <a href="#EpochElements">ModbusEpochRegister</a>, <a href="#BytesElements">ModbusBytesRegister</a>.
 - **File records**: support <a href="#FileRecords">File Records</a> function code 0x14 and 0x15 of different types of numeric records <a href="#FileRecordTypes">(int16, uint16, int32, uint32, float and double)</a>.
 - **Endianness**: Define how bytes are arranged in the modbus register.
   - ABCD(swapWord: false, swapByte: false)
@@ -131,6 +132,8 @@ Typical elements are simple bit and numeric values:
 - **ModbusUint16Register**
 - **ModbusInt32Register**
 - **ModbusUint32Register**
+- **ModbusInt64Register**
+- **ModbusUint64Register**
 - **ModbusFloatRegister**
 - **ModbusDoubleRegister**
 

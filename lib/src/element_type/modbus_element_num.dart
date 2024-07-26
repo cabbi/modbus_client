@@ -88,7 +88,7 @@ class ModbusInt16Register extends ModbusNumRegister {
 
   @override
   Uint8List _toBytes(dynamic value) =>
-      Uint8List(2)..buffer.asByteData().setInt16(0, value);
+      Uint8List(byteCount)..buffer.asByteData().setInt16(0, value);
 }
 
 /// An unsigned 16 bit register
@@ -113,7 +113,7 @@ class ModbusUint16Register extends ModbusNumRegister {
 
   @override
   Uint8List _toBytes(dynamic value) =>
-      Uint8List(2)..buffer.asByteData().setUint16(0, value);
+      Uint8List(byteCount)..buffer.asByteData().setUint16(0, value);
 }
 
 /// A signed 32 bit register
@@ -136,7 +136,7 @@ class ModbusInt32Register extends ModbusNumRegister {
 
   @override
   Uint8List _toBytes(dynamic value) =>
-      Uint8List(4)..buffer.asByteData().setInt32(0, value);
+      Uint8List(byteCount)..buffer.asByteData().setInt32(0, value);
 }
 
 /// An unsigned 32 bit register
@@ -159,7 +159,53 @@ class ModbusUint32Register extends ModbusNumRegister {
 
   @override
   Uint8List _toBytes(dynamic value) =>
-      Uint8List(4)..buffer.asByteData().setUint32(0, value);
+      Uint8List(byteCount)..buffer.asByteData().setUint32(0, value);
+}
+
+/// A signed 64 bit register
+class ModbusInt64Register extends ModbusNumRegister {
+  ModbusInt64Register(
+      {required super.name,
+      required super.address,
+      required super.type,
+      super.description,
+      super.onUpdate,
+      super.uom,
+      super.multiplier,
+      super.offset,
+      super.viewDecimalPlaces,
+      super.endianness})
+      : super(byteCount: 8);
+
+  @override
+  int _fromBytes(Uint8List bytes) => bytes.buffer.asByteData().getInt64(0);
+
+  @override
+  Uint8List _toBytes(dynamic value) =>
+      Uint8List(byteCount)..buffer.asByteData().setInt64(0, value);
+}
+
+/// An unsigned 64 bit register
+class ModbusUint64Register extends ModbusNumRegister {
+  ModbusUint64Register(
+      {required super.name,
+      required super.address,
+      required super.type,
+      super.uom,
+      super.description,
+      super.onUpdate,
+      super.multiplier,
+      super.offset,
+      super.viewDecimalPlaces,
+      super.endianness})
+      : super(byteCount: 8);
+
+  @override
+  int _fromBytes(Uint8List bytes) => bytes.buffer.asByteData().getUint64(0);
+
+  @override
+  Uint8List _toBytes(dynamic value) =>
+      Uint8List(byteCount)..buffer.asByteData().setUint64(0, value);
 }
 
 /// A 32 bit Float register
@@ -185,7 +231,7 @@ class ModbusFloatRegister extends ModbusNumRegister<double> {
 
   @override
   Uint8List _toBytes(dynamic value) =>
-      Uint8List(4)..buffer.asByteData().setFloat32(0, value);
+      Uint8List(byteCount)..buffer.asByteData().setFloat32(0, value);
 }
 
 /// A 64 bit Double register
@@ -211,5 +257,5 @@ class ModbusDoubleRegister extends ModbusNumRegister<double> {
 
   @override
   Uint8List _toBytes(dynamic value) =>
-      Uint8List(8)..buffer.asByteData().setFloat64(0, value);
+      Uint8List(byteCount)..buffer.asByteData().setFloat64(0, value);
 }
