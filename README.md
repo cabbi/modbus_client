@@ -5,6 +5,7 @@ This is a set of packages implementing Modbus Client sending requests to a remot
 - [Modbus Client TCP](https://pub.dev/packages/modbus_client_tcp) implements the **TCP** protocol to send requests via **ethernet networks**.
 - [Modbus Client UDP](https://pub.dev/packages/modbus_client_udp) implements the **UDP** protocol to send requests via **ethernet networks**.
 - [Modbus Client Serial](https://pub.dev/packages/modbus_client_serial) implements the **ASCII** and **RTU** protocols to send requests via **Serial Port**
+- [Modbus Client Serial Android](https://pub.dev/packages/modbus_client_serial_android) implements the **ASCII** and **RTU** protocols to send requests via Android's **USB Serial Port**
 
 The split of the packages is done to minimize dependencies on your project.
 

@@ -1,3 +1,6 @@
+## 1.4.0
+- Moved abstract serial implementation to this package to simplify multiple serial packages implementation
+
 ## 1.3.1
 - Added 'ModbusInt64Register' and 'ModbusUint64Register' registers
 
