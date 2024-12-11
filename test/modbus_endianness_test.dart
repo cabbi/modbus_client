@@ -233,4 +233,35 @@ void main() {
       expect(read.element.value, num);
     });
   });
+
+  group("Tests endianness for group", () {
+    test("uint32+float BA DC", () {
+      final u32Value = 4159429653;
+      final floatValue = -9.567605972290039;
+
+      final bytes = Uint8List.fromList([
+        0xEB, 0xF7, 0x15, 0xDC, // uint32 bytes
+        0x19, 0xC1, 0xEA, 0x14 // float bytes
+      ]);
+
+      final uint32 = ModbusUint32Register(
+        name: "uint32",
+        address: 14,
+        type: ModbusElementType.holdingRegister,
+        endianness: ModbusEndianness.BADC,
+      );
+      final float = ModbusFloatRegister(
+        name: "float",
+        address: 16,
+        type: ModbusElementType.holdingRegister,
+        endianness: ModbusEndianness.BADC,
+      );
+      final reg = ModbusElementsGroup([uint32, float]);
+
+      final read = reg.getReadRequest();
+      read.internalSetElementData(bytes);
+      expect(uint32.value, u32Value);
+      expect(float.value, floatValue);
+    });
+  });
 }
