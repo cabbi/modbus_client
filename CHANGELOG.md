@@ -1,3 +1,12 @@
+## 1.4.1
+- Fix: endianness issue for ModbusElementsGroup. Thanks to [bruce3x](https://github.com/bruce3x/)
+  
+## 1.4.0
+- Moved abstract serial implementation to this package to simplify multiple serial packages implementation
+
+## 1.3.1
+- Added 'ModbusInt64Register' and 'ModbusUint64Register' registers
+
 ## 1.3.0
 - Added 'ModbusEndianess' handling for numeric registers
 - Added 'ModbusFloatRegister' and 'ModbusDoubleRegister' registers

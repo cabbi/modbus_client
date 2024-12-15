@@ -10,6 +10,7 @@ export 'src/modbus_element.dart';
 export 'src/modbus_element_group.dart';
 export 'src/modbus_app_logger.dart';
 export 'src/modbus_file_record.dart';
+export 'src/serial/modbus_client_serial.dart';
 
 enum FunctionType { read, writeSingle, writeMultiple, custom }
 
