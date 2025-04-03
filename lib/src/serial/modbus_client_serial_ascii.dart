@@ -6,7 +6,8 @@ class ModbusClientSerialAsciiBase extends ModbusClientSerial {
       {required super.serialPort,
       super.unitId,
       super.connectionMode = ModbusConnectionMode.autoConnectAndKeepConnected,
-      super.responseTimeout = const Duration(seconds: 3)});
+      super.responseTimeout = const Duration(seconds: 3),
+      super.flushOnRequest = true});
 
   @override
   int get checksumByteCount => 1;

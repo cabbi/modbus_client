@@ -157,7 +157,8 @@ class ModbusReadGroupRequest extends ModbusElementRequest {
     for (var register in elementGroup) {
       if (register.type.isRegister) {
         var startIndex = (register.address - elementGroup.startAddress) * 2;
-        final bytes = data.sublist(startIndex, startIndex + (register.byteCount));
+        final bytes =
+            data.sublist(startIndex, startIndex + (register.byteCount));
         register.setValueFromBytes(register.endianness.getEndianBytes(bytes));
       }
       if (register.type.isBit) {

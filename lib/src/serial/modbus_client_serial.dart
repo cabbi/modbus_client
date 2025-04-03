@@ -14,12 +14,14 @@ part 'modbus_serial_port.dart';
 abstract class ModbusClientSerial extends ModbusClient {
   ModbusSerialPort serialPort;
   final Lock _lock = Lock();
+  final bool flushOnRequest;
 
   ModbusClientSerial(
       {required this.serialPort,
       super.unitId,
       super.connectionMode = ModbusConnectionMode.autoConnectAndKeepConnected,
-      super.responseTimeout = const Duration(seconds: 3)});
+      super.responseTimeout = const Duration(seconds: 3),
+      this.flushOnRequest = true});
 
   /// Returns the serial telegram checksum length
   int get checksumByteCount;
@@ -78,8 +80,11 @@ abstract class ModbusClientSerial extends ModbusClient {
       // Send the request data
       var unitId = getUnitId(request);
       try {
-        // Flush both tx & rx buffers (discard old pending requests & responses)
-        await serialPort.flush();
+        // Flush both tx & rx buffers if requested (i.e. discard old pending
+        // requests & responses)
+        if (flushOnRequest) {
+          await serialPort.flush();
+        }
 
         // Sent the serial telegram
         var reqTxData = _getTxTelegram(request, unitId);

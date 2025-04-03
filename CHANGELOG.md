@@ -1,3 +1,6 @@
+## 1.4.2
+- Added 'flushOnRequest' to ModbusClientSerial class (https://github.com/cabbi/modbus_client/issues/11)
+  
 ## 1.4.1
 - Fix: endianness issue for ModbusElementsGroup. Thanks to [bruce3x](https://github.com/bruce3x/)
   
