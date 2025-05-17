@@ -86,14 +86,19 @@ abstract class ModbusClientSerial extends ModbusClient {
           await serialPort.flush();
         }
 
-        // Sent the serial telegram
+        // Send the serial telegram
         var reqTxData = _getTxTelegram(request, unitId);
         int txDataCount =
             await serialPort.write(reqTxData, timeout: resTimeout);
+
         if (txDataCount < reqTxData.length) {
+          ModbusAppLogger.finest(
+              "Error sending data: sent $txDataCount of ${reqTxData.length} bytes");
           request.setResponseCode(ModbusResponseCode.requestTimeout);
           return request.responseCode;
         }
+        ModbusAppLogger.finest(
+            "Sent data: ${ModbusAppLogger.toHex(reqTxData)}");
       } catch (ex) {
         ModbusAppLogger.severe(
             "Unexpected exception in sending data to ${serialPort.name}", ex);
@@ -108,9 +113,11 @@ abstract class ModbusClientSerial extends ModbusClient {
           unitId: unitId,
           checksumByteCount: checksumByteCount);
       Duration remainingTime = resTimeout - reqStopwatch.elapsed;
-      var responseCode = remainingTime.isNegative
-          ? ModbusResponseCode.requestTimeout
-          : await _readResponseHeader(response, remainingTime);
+      var responseCode = ModbusResponseCode.requestTimeout;
+      if (!remainingTime.isNegative) {
+        ModbusAppLogger.finest("Receiving header...");
+        responseCode = await _readResponseHeader(response, remainingTime);
+      }
       if (responseCode != ModbusResponseCode.requestSucceed) {
         request.setResponseCode(responseCode);
         return request.responseCode;
@@ -118,9 +125,14 @@ abstract class ModbusClientSerial extends ModbusClient {
 
       // Lets wait the rest of the PDU response
       remainingTime = resTimeout - reqStopwatch.elapsed;
-      responseCode = remainingTime.isNegative
-          ? ModbusResponseCode.requestTimeout
-          : await _readResponsePdu(response, remainingTime);
+
+      if (!remainingTime.isNegative) {
+        ModbusAppLogger.finest("Receiving PDU...");
+        responseCode = await _readResponsePdu(response, remainingTime);
+      } else {
+        responseCode = ModbusResponseCode.requestTimeout;
+      }
+
       if (responseCode != ModbusResponseCode.requestSucceed) {
         request.setResponseCode(responseCode);
         return request.responseCode;
@@ -164,9 +176,15 @@ class _ModbusSerialResponse {
       required this.checksumByteCount});
 
   List<int>? _rxData;
-  void setRxData(List<int> rxData) =>
-      _rxData = List<int>.from(rxData, growable: true);
-  void addRxData(List<int> rxData) => _rxData!.addAll(rxData);
+  void setRxData(List<int> rxData) {
+    _rxData = List<int>.from(rxData, growable: true);
+    ModbusAppLogger.finest("Incoming data: ${ModbusAppLogger.toHex(_rxData!)}");
+  }
+
+  void addRxData(List<int> rxData) {
+    _rxData!.addAll(rxData);
+    ModbusAppLogger.finest("Incoming data: ${ModbusAppLogger.toHex(_rxData!)}");
+  }
 
   ModbusResponseCode get headerResponseCode {
     if (_rxData == null || _rxData!.length < 3) {

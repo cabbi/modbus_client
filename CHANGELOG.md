@@ -1,3 +1,6 @@
+## 1.4.3
+- Added sent and received serial data to 'FINEST' log
+
 ## 1.4.2
 - Added 'flushOnRequest' to ModbusClientSerial class (https://github.com/cabbi/modbus_client/issues/11)
   
