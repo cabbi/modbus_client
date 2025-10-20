@@ -44,7 +44,7 @@ class ModbusBitMaskRegister extends ModbusElement<List<ModbusBitMask>> {
   @override
   int _getRawValue(dynamic value) {
     // Expecting a List of ModbusBitMask
-    if (value! is List<ModbusBitMask>) {
+    if (value is! List<ModbusBitMask>) {
       throw ModbusException(
           context: "ModbusBitElement",
           msg: "Write request expects value to be List<ModbusBitMask>!");

@@ -1,3 +1,6 @@
+## 1.4.4
+- Fix: [ModbusBitElement has a typo in type check](https://github.com/cabbi/modbus_client/issues/18)
+  
 ## 1.4.3
 - Added sent and received serial data to 'FINEST' log
 
