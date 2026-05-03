@@ -33,12 +33,12 @@ class ModbusBytesRegister extends ModbusElement<Uint8List> {
   }
 
   @override
-  Uint8List _getRawValue(dynamic value) {
+  dynamic _getRawValue(dynamic value) {
     // Expecting a Uint8List object
-    if (value is! Uint8List) {
+    if (value is! Uint8List && value is! int) {
       throw ModbusException(
           context: "ModbusBytesRegister",
-          msg: "Write request expects value to be 'Uint8List'!");
+          msg: "Write request expects value to be 'Uint8List' or 'int'!");
     }
     return value;
   }
@@ -63,28 +63,45 @@ class ModbusBytesRegister extends ModbusElement<Uint8List> {
       {bool rawValue = false,
       int? unitId,
       Duration? responseTimeout,
-      ModbusEndianness? endianness}) {
-    // Expecting a Uint8List object
-    if (value is! Uint8List) {
-      throw ModbusException(
-          context: "ModbusBytesRegister",
-          msg: "Write request expects value to be 'Uint8List'!");
+      ModbusEndianness? endianness,
+      bool isSingleWriteRegister = false}) {
+    if(!isSingleWriteRegister) {
+      // Expecting a Uint8List object
+      if (value is! Uint8List) {
+        throw ModbusException(
+            context: "ModbusBytesRegister",
+            msg: "Write request expects value to be 'Uint8List'!");
+      }
+      // Expecting a same length as the original byte count
+      if (value.length != byteCount) {
+        throw ModbusException(
+            context: "ModbusBytesRegister",
+            msg: "The length of 'value' must match 'byteCount'!");
+      }
+      // Expecting a multiple write function code
+      if (type.writeMultipleFunction == null) {
+        throw ModbusException(
+            context: "ModbusBytesRegister.getWriteRequest",
+            msg: "ModbusBytesRegister requires 'writeMultipleFunction' code!");
+      }
+    } else {
+      // Expecting an int object
+      if (value is! int) {
+        throw ModbusException(
+            context: "ModbusBytesRegister",
+            msg: "Write request expects value to be 'int'!");
+      }
     }
-    // Expecting a same length as the original byte count
-    if (value.length != byteCount) {
-      throw ModbusException(
-          context: "ModbusBytesRegister",
-          msg: "The length of 'value' must match 'byteCount'!");
-    }
-    // Expecting a multiple write function code
-    if (type.writeMultipleFunction == null) {
-      throw ModbusException(
-          context: "ModbusBytesRegister.getWriteRequest",
-          msg: "ModbusBytesRegister requires 'writeMultipleFunction' code!");
-    }
-    return getMultipleWriteRequest(value,
+    if(!isSingleWriteRegister) {
+      return getMultipleWriteRequest(value,
         unitId: unitId,
         responseTimeout: responseTimeout,
         endianness: endianness);
+    } else {
+      return super.getWriteRequest(value,
+        unitId: unitId,
+        responseTimeout: responseTimeout,
+        endianness: endianness);
+    }
   }
 }
