@@ -58,7 +58,7 @@ class ModbusElementsGroup extends Iterable<ModbusElement> {
         unitId: unitId, responseTimeout: responseTimeout);
   }
 
-/* NO IMPLEMENTED: 
+/* NOT IMPLEMENTED: 
    here are some consideration that prevent me to implement writing
    to multiple-register:   
      - Multiple write requires consecutive element addresses

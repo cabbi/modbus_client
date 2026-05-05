@@ -1,3 +1,6 @@
+## 1.4.5
+- [Add support to single write register option when writing a value](https://github.com/cabbi/modbus_client/pull/21)
+
 ## 1.4.4
 - Fix: [ModbusBitElement has a typo in type check](https://github.com/cabbi/modbus_client/issues/18)
   
@@ -43,7 +46,7 @@
 - Added Modbus Read & Write file records (i.e. 0x14 & 0x15 function codes)
 
 ## 1.0.4
-- Added 'onUpdate' paameter for ModbusDiscreteInput and ModbusCoil
+- Added 'onUpdate' parameter for ModbusDiscreteInput and ModbusCoil
 
 ## 1.0.3+3
 - Little adjustment in case 'setResponseCode' is called multiple times
